@@ -123,6 +123,8 @@ final class IPCCommandWireShapeTests: XCTestCase {
         #"{"arguments":{"operation":"grow"},"name":"resize-focused"}"#,
         #"{"arguments":{"direction":"left"},"name":"preselect"}"#,
         #"{"name":"preselect-clear"}"#,
+        #"{"name":"focus-next-tab-in-tile"}"#,
+        #"{"name":"focus-previous-tab-in-tile"}"#,
         #"{"name":"open-command-palette"}"#,
         #"{"arguments":{"mode":"clipboard"},"name":"open-command-palette-mode"}"#,
         #"{"name":"raise-all-floating-windows"}"#,

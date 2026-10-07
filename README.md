@@ -878,6 +878,8 @@ Dwindle groups use the existing Focus and Move bindings, so there are no separat
 
 With **Settings > Dwindle Layout > Disable Tab Groups** (`dwindle.disableTabGroups = true`), Dwindle never forms groups: existing groups split into separate tiles, `Focus` moves spatially between tiles without visiting tabs, and `Move` swaps the focused tile with its neighbor exactly like `Move Container`.
 
+With **Settings > Dwindle Layout > Directional Focus Skips Tabs** (`dwindle.directionalFocusSkipsTabs = true`), `Focus` in every direction goes straight to the neighboring tile, keeping that tile's active tab; at an edge it only tries the monitor transition and never cycles or wraps tabs. Assign **Next Tab in Tile** and **Previous Tab in Tile** in Settings > Hotkeys to cycle the focused tile's tabs; they wrap locally and never leave the tile.
+
 | Goal | Default Shortcut | Behavior |
 |------|------------------|----------|
 | Focus another tile | `Option + Arrow Keys` | Left / Right are always spatial. Up / Down are spatial for a singleton tile. |

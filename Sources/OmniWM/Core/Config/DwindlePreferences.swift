@@ -45,6 +45,10 @@ final class DwindlePreferences {
         didSet { onChange?() }
     }
 
+    var directionalFocusSkipsTabs = DwindlePreferences.defaults.directionalFocusSkipsTabs ?? false {
+        didSet { onChange?() }
+    }
+
     var monitorOverrides: [MonitorDwindleSettings] = [] {
         didSet { onChange?() }
     }
@@ -57,7 +61,8 @@ final class DwindlePreferences {
             singleWindowFit: singleWindowFit,
             useGlobalGaps: useGlobalGaps,
             moveToRootStable: moveToRootStable,
-            disableTabGroups: disableTabGroups
+            disableTabGroups: disableTabGroups,
+            directionalFocusSkipsTabs: directionalFocusSkipsTabs
         )
     }
 
@@ -69,6 +74,7 @@ final class DwindlePreferences {
         useGlobalGaps = dwindle.useGlobalGaps
         moveToRootStable = dwindle.moveToRootStable
         disableTabGroups = dwindle.disableTabGroups ?? false
+        directionalFocusSkipsTabs = dwindle.directionalFocusSkipsTabs ?? false
     }
 
     func settings(for monitor: Monitor) -> MonitorDwindleSettings? {

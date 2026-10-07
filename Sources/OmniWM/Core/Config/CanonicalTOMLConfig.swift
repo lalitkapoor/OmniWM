@@ -79,6 +79,7 @@ extension CanonicalTOMLConfig {
         niri.edgeGaps = niri.edgeGaps ?? true
         dwindle = try container.decode(SettingsExport.Dwindle.self, forKey: .dwindle)
         dwindle.disableTabGroups = dwindle.disableTabGroups ?? false
+        dwindle.directionalFocusSkipsTabs = dwindle.directionalFocusSkipsTabs ?? false
         borders = try container.decode(SettingsExport.Borders.self, forKey: .borders)
         overview = try container.decode(SettingsExport.Overview.self, forKey: .overview)
         workspaceBar = try container.decode(SettingsExport.WorkspaceBar.self, forKey: .workspaceBar)

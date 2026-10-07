@@ -151,6 +151,7 @@ final class CommandHandler {
             {
                 return
             }
+            guard !controller.settings.dwindle.directionalFocusSkipsTabs else { return }
             _ = controller.dwindleLayoutHandler.wrapGroupFocus(direction: direction)
         case .niri,
              .defaultLayout:

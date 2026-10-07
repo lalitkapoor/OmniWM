@@ -98,7 +98,7 @@ omniwmctl command <command-path> [arguments...]
 
 `command move <direction>` follows the active layout's orientation and configured edge behavior, including optional monitor crossing. The explicit consume-or-expel commands use fixed Niri column order, never wrap or cross monitors, and cannot be assigned as shortcuts.
 
-In Dwindle, `focus left/right` remains spatial. `focus up/down` traverses a group's eligible tabs; at the group edge it tries a spatial neighbor, then the configured monitor transition, and wraps locally only when neither exit succeeds. `move <direction>` joins a singleton with the touching tile or extracts only the active member from a group onto that side. Moving between two existing groups is a two-step extract-then-join operation. Use `move-column <direction>` when the complete tile or group should move instead. When `dwindle.disableTabGroups` is `true`, `focus` is spatial in every direction and `move <direction>` swaps tiles like `move-column`.
+In Dwindle, `focus left/right` remains spatial. `focus up/down` traverses a group's eligible tabs; at the group edge it tries a spatial neighbor, then the configured monitor transition, and wraps locally only when neither exit succeeds. `move <direction>` joins a singleton with the touching tile or extracts only the active member from a group onto that side. Moving between two existing groups is a two-step extract-then-join operation. Use `move-column <direction>` when the complete tile or group should move instead. When `dwindle.disableTabGroups` is `true`, `focus` is spatial in every direction and `move <direction>` swaps tiles like `move-column`. When `dwindle.directionalFocusSkipsTabs` is `true`, `focus <direction>` goes straight to the neighboring tile (keeping that tile's active tab) and, at an edge, follows only the monitor transition without cycling or wrapping tabs; use `focus-next-tab-in-tile` / `focus-previous-tab-in-tile` to switch tabs.
 
 ### Workspace Switching
 
@@ -175,6 +175,8 @@ Workspace IDs are global, so `switch-workspace 3` targets workspace `3` wherever
 | `command resize-focused` | `<grow\|shrink>` | dwindle | Grow or shrink the focused window |
 | `command preselect` | `<left\|right\|up\|down>` | dwindle | Set the preselection direction |
 | `command preselect clear` | — | dwindle | Clear the preselection |
+| `command focus-next-tab-in-tile` | — | dwindle | Focus the next eligible tab in the focused tile, wrapping locally; never leaves the tile |
+| `command focus-previous-tab-in-tile` | — | dwindle | Focus the previous eligible tab in the focused tile, wrapping locally; never leaves the tile |
 
 ### Layout & Sizing
 

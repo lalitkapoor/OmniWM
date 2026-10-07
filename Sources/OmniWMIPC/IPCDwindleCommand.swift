@@ -10,6 +10,8 @@ public enum IPCDwindleCommandName: String, CaseIterable, Hashable, Sendable {
     case resizeFocused = "resize-focused"
     case preselect = "preselect"
     case preselectClear = "preselect-clear"
+    case focusNextTabInTile = "focus-next-tab-in-tile"
+    case focusPreviousTabInTile = "focus-previous-tab-in-tile"
 }
 
 public enum IPCDwindleCommand: Equatable, Sendable {
@@ -21,6 +23,8 @@ public enum IPCDwindleCommand: Equatable, Sendable {
     case resizeFocused(operation: IPCResizeOperation)
     case preselect(direction: IPCDirection)
     case preselectClear
+    case focusNextTabInTile
+    case focusPreviousTabInTile
 
     public var name: IPCDwindleCommandName {
         switch self {
@@ -40,6 +44,10 @@ public enum IPCDwindleCommand: Equatable, Sendable {
             .preselect
         case .preselectClear:
             .preselectClear
+        case .focusNextTabInTile:
+            .focusNextTabInTile
+        case .focusPreviousTabInTile:
+            .focusPreviousTabInTile
         }
     }
 
@@ -62,6 +70,10 @@ public enum IPCDwindleCommand: Equatable, Sendable {
             self = try .preselect(direction: arguments.direction())
         case .preselectClear:
             self = try arguments.requireNoArguments(.preselectClear)
+        case .focusNextTabInTile:
+            self = try arguments.requireNoArguments(.focusNextTabInTile)
+        case .focusPreviousTabInTile:
+            self = try arguments.requireNoArguments(.focusPreviousTabInTile)
         }
     }
 
@@ -77,7 +89,9 @@ public enum IPCDwindleCommand: Equatable, Sendable {
              .moveToRoot,
              .toggleSplit,
              .swapSplit,
-             .preselectClear:
+             .preselectClear,
+             .focusNextTabInTile,
+             .focusPreviousTabInTile:
             break
         }
     }
