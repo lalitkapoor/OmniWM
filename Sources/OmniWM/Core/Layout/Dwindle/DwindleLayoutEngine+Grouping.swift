@@ -35,7 +35,8 @@ extension DwindleLayoutEngine {
         in workspaceId: WorkspaceDescriptor.ID
     ) -> Bool {
         assertSanctionedMutation()
-        guard let state = existingState(for: workspaceId),
+        guard !settings.disableTabGroups,
+              let state = existingState(for: workspaceId),
               let sourceLeaf = state.leafByToken[token],
               let sourceTile = sourceLeaf.tile,
               let sourceMemberIndex = sourceTile.memberIndex(for: token),
@@ -110,6 +111,53 @@ extension DwindleLayoutEngine {
         state.selectedNodeId = newLeaf.id
         if state.pendingMovementFrameSeeds[token] == nil {
             state.pendingMovementFrameSeeds[token] = movementFrameSeed
+        }
+        return true
+    }
+
+    /// Splits every grouped tile into singleton tiles, keeping member order in reading order:
+    /// each later member takes the right or lower half of the previous member's tile.
+    @discardableResult
+    func separateGroups(in workspaceId: WorkspaceDescriptor.ID) -> Bool {
+        assertSanctionedMutation()
+        guard let state = existingState(for: workspaceId) else { return false }
+        let groupedLeaves = state.root.collectAllLeaves().filter { $0.tile?.isGrouped == true }
+        guard !groupedLeaves.isEmpty else { return false }
+
+        let now = animationClock?.now() ?? CACurrentMediaTime()
+        for leaf in groupedLeaves {
+            guard let tile = leaf.tile else { continue }
+            let activeToken = tile.activeToken
+            let wasSelected = state.selectedNodeId == leaf.id
+            let movementFrameSeed = leaf.presentedFrame(at: now)
+            var splitsVertically = leaf.cachedFrame.map { $0.height * settings.splitWidthMultiplier > $0.width }
+                ?? false
+            var anchor = leaf
+
+            while tile.members.count > 1 {
+                let member = tile.remove(at: 1)
+                state.leafByToken.removeValue(forKey: member.token)
+                let newLeaf = splitLeaf(
+                    anchor,
+                    tiles: (
+                        new: DwindleTile(token: member.token, fullscreen: member.isFullscreen),
+                        existing: anchor.tile
+                    ),
+                    state: state,
+                    activeWindowFrame: nil,
+                    preselectedDirection: splitsVertically ? .down : .right
+                )
+                state.leafByToken[member.token] = newLeaf
+                if state.pendingMovementFrameSeeds[member.token] == nil {
+                    state.pendingMovementFrameSeeds[member.token] = movementFrameSeed
+                }
+                splitsVertically.toggle()
+                anchor = newLeaf
+            }
+
+            if wasSelected {
+                state.selectedNodeId = state.leafByToken[activeToken]?.id
+            }
         }
         return true
     }

@@ -163,6 +163,8 @@ The daily `Focus` and `Move` shortcuts adapt to the active layout and Niri orien
 
 Dwindle groups use the existing Focus and Move bindings, so there are no separate group shortcuts to memorize. Only the active member occupies the tile; the other members stay hidden and the clickable tab rail shows their order.
 
+With **Settings > Dwindle Layout > Disable Tab Groups** (`dwindle.disableTabGroups = true`), Dwindle never forms groups: existing groups split into separate tiles, `Focus` moves spatially between tiles without visiting tabs, and `Move` swaps the focused tile with its neighbor exactly like `Move Container`.
+
 | Goal | Default Shortcut | Behavior |
 |------|------------------|----------|
 | Focus another tile | `Option + Arrow Keys` | Left / Right are always spatial. Up / Down are spatial for a singleton tile. |

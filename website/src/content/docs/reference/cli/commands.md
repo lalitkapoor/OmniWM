@@ -98,7 +98,7 @@ omniwmctl command <command-path> [arguments...]
 
 `command move <direction>` follows the active layout's orientation and configured edge behavior, including optional monitor crossing. The explicit consume-or-expel commands use fixed Niri column order, never wrap or cross monitors, and cannot be assigned as shortcuts.
 
-In Dwindle, `focus left/right` remains spatial. `focus up/down` traverses a group's eligible tabs; at the group edge it tries a spatial neighbor, then the configured monitor transition, and wraps locally only when neither exit succeeds. `move <direction>` joins a singleton with the touching tile or extracts only the active member from a group onto that side. Moving between two existing groups is a two-step extract-then-join operation. Use `move-column <direction>` when the complete tile or group should move instead.
+In Dwindle, `focus left/right` remains spatial. `focus up/down` traverses a group's eligible tabs; at the group edge it tries a spatial neighbor, then the configured monitor transition, and wraps locally only when neither exit succeeds. `move <direction>` joins a singleton with the touching tile or extracts only the active member from a group onto that side. Moving between two existing groups is a two-step extract-then-join operation. Use `move-column <direction>` when the complete tile or group should move instead. When `dwindle.disableTabGroups` is `true`, `focus` is spatial in every direction and `move <direction>` swaps tiles like `move-column`.
 
 ### Workspace Switching
 

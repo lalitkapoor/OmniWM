@@ -58,6 +58,10 @@ extension DwindleLayoutEngine {
             removeWindow(token: token, from: workspaceId)
         }
 
+        if settings.disableTabGroups {
+            separateGroups(in: workspaceId)
+        }
+
         if let state = existingState(for: workspaceId) {
             reconcileProjectedSelection(preferredToken: focusedToken, in: state)
         }

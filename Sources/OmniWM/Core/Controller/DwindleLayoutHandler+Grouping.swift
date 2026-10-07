@@ -35,6 +35,9 @@ extension DwindleLayoutHandler {
     }
 
     func moveWindow(direction: Direction) -> WindowMoveOutcome {
+        if controller?.settings.dwindle.disableTabGroups == true {
+            return swapWindow(direction: direction)
+        }
         var outcome = WindowMoveOutcome.blocked
         withDwindleContext { engine, workspaceId in
             guard let token = engine.projectedActiveToken(in: workspaceId) else { return }
@@ -141,7 +144,8 @@ extension DwindleLayoutHandler {
         engine: DwindleLayoutEngine,
         workspaceId: WorkspaceDescriptor.ID
     ) -> Bool {
-        guard let offset = groupMemberOffset(for: direction),
+        guard !engine.settings.disableTabGroups,
+              let offset = groupMemberOffset(for: direction),
               let activeToken = engine.projectedActiveToken(in: workspaceId),
               let snapshot = engine.tileSnapshot(for: activeToken, in: workspaceId),
               let activeIndex = snapshot.members.firstIndex(where: { $0.token == activeToken }),

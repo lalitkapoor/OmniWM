@@ -42,6 +42,7 @@ extension DwindleLayoutHandler {
         engine.settings.splitWidthMultiplier = settings.splitWidthMultiplier
         engine.settings.singleWindowFit = settings.singleWindowFit
         engine.settings.innerGap = settings.innerGap
+        engine.settings.disableTabGroups = settings.disableTabGroups
         engine.tabRailWidth = (controller?.tabRailStyle ?? .compact).reservedWidth
     }
 
@@ -55,6 +56,7 @@ extension DwindleLayoutHandler {
         settings.splitWidthMultiplier = resolved.splitWidthMultiplier
         settings.singleWindowFit = resolved.singleWindowFit
         settings.innerGap = resolved.innerGap
+        settings.disableTabGroups = resolved.disableTabGroups
         return settings
     }
 }

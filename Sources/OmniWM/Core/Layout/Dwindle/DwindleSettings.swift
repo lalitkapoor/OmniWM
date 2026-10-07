@@ -13,6 +13,7 @@ struct DwindleSettings {
     var resizeStep: CGFloat = 0.1
 
     var singleWindowFit: SingleWindowFit = .fullScreen
+    var disableTabGroups: Bool = false
 
     var innerGap: CGFloat = 8.0
 
