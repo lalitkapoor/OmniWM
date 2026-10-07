@@ -153,6 +153,7 @@ struct SettingsExport: Equatable {
         var useGlobalGaps: Bool
         var moveToRootStable: Bool
         var disableTabGroups: Bool?
+        var directionalFocusSkipsTabs: Bool?
     }
 
     struct Overview: Codable, Equatable {
@@ -397,7 +398,8 @@ extension SettingsExport.Dwindle {
             singleWindowFit: .fullScreen,
             useGlobalGaps: true,
             moveToRootStable: true,
-            disableTabGroups: false
+            disableTabGroups: false,
+            directionalFocusSkipsTabs: false
         )
     }
 }
