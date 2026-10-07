@@ -25,7 +25,7 @@ extension DwindleLayoutEngine {
             return nil
         }
 
-        var bestCandidate: (handle: WindowToken, overlap: CGFloat)?
+        var bestCandidate: DwindleNavigationCandidate?
 
         collectNavigationCandidates(
             at: .init(node: state.root, rect: rootFrame, boundaryEdges: .all),
@@ -111,7 +111,7 @@ extension DwindleLayoutEngine {
     private func collectNavigationCandidates(
         at position: DwindleTraversalPosition,
         search: DwindleNavigationSearch,
-        bestCandidate: inout (handle: WindowToken, overlap: CGFloat)?
+        bestCandidate: inout DwindleNavigationCandidate?
     ) {
         let node = position.node
         guard node.id != search.current.id else { return }
@@ -127,10 +127,15 @@ extension DwindleLayoutEngine {
                 to: candidateFrame,
                 direction: search.direction,
                 innerGap: search.innerGap
-            ),
-                bestCandidate.map({ overlap > $0.overlap }) ?? true
-            {
-                bestCandidate = (member.token, overlap)
+            ) {
+                let candidate = DwindleNavigationCandidate(
+                    handle: member.token,
+                    overlap: overlap,
+                    frame: candidateFrame
+                )
+                if bestCandidate.map({ candidate.isBetter(than: $0, direction: search.direction) }) ?? true {
+                    bestCandidate = candidate
+                }
             }
             return
         }
@@ -197,6 +202,30 @@ extension DwindleLayoutEngine {
 
             let minRequired = min(source.height, target.height) * minOverlapRatio
             return overlap >= minRequired ? overlap : nil
+        }
+    }
+}
+
+struct DwindleNavigationCandidate {
+    static let overlapTieTolerance: CGFloat = 1
+
+    let handle: WindowToken
+    let overlap: CGFloat
+    let frame: CGRect
+
+    /// Larger overlap wins; near-equal overlaps go to the topmost tile for Left/Right
+    /// and the leftmost tile for Up/Down (reading order). Layout y grows upward.
+    func isBetter(than other: DwindleNavigationCandidate, direction: Direction) -> Bool {
+        guard abs(overlap - other.overlap) <= Self.overlapTieTolerance else {
+            return overlap > other.overlap
+        }
+        switch direction {
+        case .left,
+             .right:
+            return frame.maxY > other.frame.maxY
+        case .up,
+             .down:
+            return frame.minX < other.frame.minX
         }
     }
 }
