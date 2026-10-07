@@ -59,6 +59,14 @@ private struct GlobalDwindleSettingsSection: View {
             Toggle("Move to Root: Stable", isOn: Bindable(settings.dwindle).moveToRootStable)
             SettingsCaption(localized: "Keep window on same screen side when moving to root")
 
+            Toggle("Disable Tab Groups", isOn: Bindable(settings.dwindle).disableTabGroups)
+                .onChange(of: settings.dwindle.disableTabGroups) { _, _ in
+                    controller.updateDwindleConfig()
+                }
+            SettingsCaption(
+                localized: "Give every tiled window its own tile; Move swaps tiles instead of grouping them"
+            )
+
             SettingsSliderRow(
                 label: String(localized: "Default Split Ratio"),
                 value: Bindable(settings.dwindle).defaultSplitRatio,
