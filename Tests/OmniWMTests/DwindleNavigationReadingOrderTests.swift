@@ -5,7 +5,7 @@ import CoreGraphics
 @testable import OmniWM
 import XCTest
 
-final class DwindleNavigationTieBreakTests: XCTestCase {
+final class DwindleNavigationReadingOrderTests: XCTestCase {
     private let screen = CGRect(x: 0, y: 0, width: 1600, height: 900)
 
     func testHorizontalFocusIntoEvenlyStackedTilesPrefersTop() throws {
@@ -34,7 +34,7 @@ final class DwindleNavigationTieBreakTests: XCTestCase {
         }
     }
 
-    func testLargerOverlapStillWinsOverTieBreak() throws {
+    func testTopmostWinsEvenWhenLowerTileIsLarger() throws {
         let (engine, ws, full, stacked) = makeLayout(full: .left)
         let top = try topmost(of: stacked, engine: engine, ws: ws)
         let bottom = try XCTUnwrap(stacked.first { $0 != top })
@@ -42,25 +42,50 @@ final class DwindleNavigationTieBreakTests: XCTestCase {
         // The first child of a vertical split is the lower tile; a ratio above 1 enlarges it.
         XCTAssertEqual(split.firstChild()?.windowToken, bottom)
         split.kind = .split(orientation: .vertical, ratio: 1.4)
-        _ = engine.calculateLayout(for: ws, screen: screen)
-
-        XCTAssertEqual(engine.findGeometricNeighbor(from: full, direction: .right, in: ws), bottom)
-    }
-
-    func testNearTieWithinOnePointCountsAsTie() throws {
-        let (engine, ws, full, stacked) = makeLayout(full: .left)
-        let top = try topmost(of: stacked, engine: engine, ws: ws)
-        let bottom = try XCTUnwrap(stacked.first { $0 != top })
-        let split = try XCTUnwrap(engine.findNode(for: top, in: ws)?.parent)
-        // Grow the lower tile by well under one point.
-        split.kind = .split(orientation: .vertical, ratio: 1.001)
         let frames = engine.calculateLayout(for: ws, screen: screen)
-        let topFrame = try XCTUnwrap(frames[top])
-        let bottomFrame = try XCTUnwrap(frames[bottom])
-        XCTAssertGreaterThan(bottomFrame.height, topFrame.height)
-        XCTAssertLessThanOrEqual(bottomFrame.height - topFrame.height, 1)
+        XCTAssertGreaterThan(try XCTUnwrap(frames[bottom]).height, try XCTUnwrap(frames[top]).height)
 
         XCTAssertEqual(engine.findGeometricNeighbor(from: full, direction: .right, in: ws), top)
+    }
+
+    func testLeftmostWinsEvenWhenRightTileIsLarger() throws {
+        let (engine, ws, full, sideBySide) = makeLayout(full: .up)
+        let left = try leftmost(of: sideBySide, engine: engine, ws: ws)
+        let right = try XCTUnwrap(sideBySide.first { $0 != left })
+        let split = try XCTUnwrap(engine.findNode(for: left, in: ws)?.parent)
+        XCTAssertEqual(split.firstChild()?.windowToken, left)
+        split.kind = .split(orientation: .horizontal, ratio: 0.6)
+        let frames = engine.calculateLayout(for: ws, screen: screen)
+        XCTAssertGreaterThan(try XCTUnwrap(frames[right]).width, try XCTUnwrap(frames[left]).width)
+
+        XCTAssertEqual(engine.findGeometricNeighbor(from: full, direction: .down, in: ws), left)
+    }
+
+    func testOnlyTilesBesideTheCurrentWindowAreConsidered() throws {
+        let (engine, ws, columns) = makeTwoStackedColumns()
+        let leftSplit = try XCTUnwrap(engine.findNode(for: columns.leftTop, in: ws)?.parent)
+        let rightSplit = try XCTUnwrap(engine.findNode(for: columns.rightTop, in: ws)?.parent)
+
+        // Left column: bottom 0...540, top 540...900. Right column split evenly at 450.
+        leftSplit.kind = .split(orientation: .vertical, ratio: 1.2)
+        _ = engine.calculateLayout(for: ws, screen: screen)
+        XCTAssertEqual(
+            engine.findGeometricNeighbor(from: columns.rightBottom, direction: .left, in: ws),
+            columns.leftBottom
+        )
+        XCTAssertEqual(
+            engine.findGeometricNeighbor(from: columns.rightTop, direction: .left, in: ws),
+            columns.leftTop
+        )
+
+        // Left column: bottom 0...270, top 270...900. Both left tiles sit beside the lower right tile.
+        leftSplit.kind = .split(orientation: .vertical, ratio: 0.6)
+        _ = engine.calculateLayout(for: ws, screen: screen)
+        XCTAssertEqual(
+            engine.findGeometricNeighbor(from: columns.rightBottom, direction: .left, in: ws),
+            columns.leftTop
+        )
+        XCTAssertEqual(rightSplit.splitRatio, 1.0)
     }
 
     /// One full-length window on `full`'s side and two evenly split windows filling the opposite side.
@@ -100,6 +125,37 @@ final class DwindleNavigationTieBreakTests: XCTestCase {
         let b = frames[second] ?? .null
         XCTAssertEqual(a.size, b.size, "the opposite side must be split evenly")
         return (engine, ws, full, [first, second])
+    }
+
+    /// Two columns, each split into an upper and a lower tile.
+    private func makeTwoStackedColumns() -> (
+        DwindleLayoutEngine,
+        WorkspaceDescriptor.ID,
+        (leftTop: WindowToken, leftBottom: WindowToken, rightTop: WindowToken, rightBottom: WindowToken)
+    ) {
+        let engine = DwindleLayoutEngine()
+        let ws = WorkspaceDescriptor.ID()
+        let leftTop = WindowToken(pid: 1, windowId: 1)
+        let rightTop = WindowToken(pid: 2, windowId: 2)
+        let rightBottom = WindowToken(pid: 3, windowId: 3)
+        let leftBottom = WindowToken(pid: 4, windowId: 4)
+
+        _ = engine.addWindow(token: leftTop, to: ws, activeWindowFrame: nil)
+        _ = engine.calculateLayout(for: ws, screen: screen)
+        XCTAssertTrue(engine.setPreselection(.right, in: ws))
+        _ = engine.addWindow(token: rightTop, to: ws, activeWindowFrame: nil)
+        _ = engine.calculateLayout(for: ws, screen: screen)
+        XCTAssertTrue(engine.setPreselection(.down, in: ws))
+        _ = engine.addWindow(token: rightBottom, to: ws, activeWindowFrame: nil)
+        _ = engine.calculateLayout(for: ws, screen: screen)
+        engine.setSelectedNode(engine.findNode(for: leftTop, in: ws), in: ws)
+        XCTAssertTrue(engine.setPreselection(.down, in: ws))
+        _ = engine.addWindow(token: leftBottom, to: ws, activeWindowFrame: nil)
+        let frames = engine.calculateLayout(for: ws, screen: screen)
+        XCTAssertGreaterThan(frames[leftTop]?.minY ?? 0, frames[leftBottom]?.minY ?? 0)
+        XCTAssertGreaterThan(frames[rightTop]?.minY ?? 0, frames[rightBottom]?.minY ?? 0)
+        XCTAssertLessThan(frames[leftTop]?.minX ?? 0, frames[rightTop]?.minX ?? 0)
+        return (engine, ws, (leftTop, leftBottom, rightTop, rightBottom))
     }
 
     private func topmost(of tokens: [WindowToken], engine: DwindleLayoutEngine, ws: WorkspaceDescriptor.ID) throws

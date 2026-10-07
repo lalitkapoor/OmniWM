@@ -122,17 +122,13 @@ extension DwindleLayoutEngine {
                 tilingArea: search.projection.tilingArea,
                 settings: settings
             )
-            if let overlap = calculateDirectionalOverlap(
+            if calculateDirectionalOverlap(
                 from: search.currentFrame,
                 to: candidateFrame,
                 direction: search.direction,
                 innerGap: search.innerGap
-            ) {
-                let candidate = DwindleNavigationCandidate(
-                    handle: member.token,
-                    overlap: overlap,
-                    frame: candidateFrame
-                )
+            ) != nil {
+                let candidate = DwindleNavigationCandidate(handle: member.token, frame: candidateFrame)
                 if bestCandidate.map({ candidate.isBetter(than: $0, direction: search.direction) }) ?? true {
                     bestCandidate = candidate
                 }
@@ -207,18 +203,12 @@ extension DwindleLayoutEngine {
 }
 
 struct DwindleNavigationCandidate {
-    static let overlapTieTolerance: CGFloat = 1
-
     let handle: WindowToken
-    let overlap: CGFloat
     let frame: CGRect
 
-    /// Larger overlap wins; near-equal overlaps go to the topmost tile for Left/Right
-    /// and the leftmost tile for Up/Down (reading order). Layout y grows upward.
+    /// Among tiles beside the current window, prefer reading order regardless of size:
+    /// the topmost tile for Left/Right and the leftmost tile for Up/Down. Layout y grows upward.
     func isBetter(than other: DwindleNavigationCandidate, direction: Direction) -> Bool {
-        guard abs(overlap - other.overlap) <= Self.overlapTieTolerance else {
-            return overlap > other.overlap
-        }
         switch direction {
         case .left,
              .right:
