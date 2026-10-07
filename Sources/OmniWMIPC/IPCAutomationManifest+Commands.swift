@@ -7,7 +7,7 @@ extension IPCAutomationManifest {
     public static let commandDescriptors: [IPCCommandDescriptor] = [
         .init(
             name: .focus(.spatial),
-            summary: "Focus spatially; Dwindle Up/Down traverse grouped tabs before edge fallback.",
+            summary: "Focus spatially; Dwindle Up/Down traverse grouped tabs before edge fallback unless dwindle.directionalFocusSkipsTabs is set.",
             arguments: [.direction]
         ),
         .init(
@@ -372,6 +372,16 @@ extension IPCAutomationManifest {
             commandWords: ["preselect", "clear"],
             name: .dwindle(.preselectClear),
             summary: "Clear the Dwindle preselection.",
+            layoutCompatibility: .dwindle
+        ),
+        .init(
+            name: .dwindle(.focusNextTabInTile),
+            summary: "Focus the next eligible tab in the focused Dwindle tile, wrapping locally; never leaves the tile.",
+            layoutCompatibility: .dwindle
+        ),
+        .init(
+            name: .dwindle(.focusPreviousTabInTile),
+            summary: "Focus the previous eligible tab in the focused Dwindle tile, wrapping locally; never leaves the tile.",
             layoutCompatibility: .dwindle
         ),
         .init(

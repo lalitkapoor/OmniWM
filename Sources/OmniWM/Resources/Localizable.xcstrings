@@ -71929,6 +71929,254 @@
         }
       }
     },
+    "Directional Focus Skips Tabs" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "方向フォーカスでタブをスキップ"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Richtungsfokus überspringt Tabs"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retningsfokus hopper over faner"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Riktningsfokus hoppar över flikar"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El foco direccional omite las pestañas"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "方向聚焦跳过标签页"
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "दिशात्मक फ़ोकस टैब छोड़ देता है"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "التركيز الاتجاهي يتخطى علامات التبويب"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fokus po smeru preskače kartice"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Η κατευθυντική εστίαση παραλείπει τις καρτέλες"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "מיקוד כיווני מדלג על כרטיסיות"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Направленный фокус пропускает вкладки"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fokus kierunkowy pomija karty"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Напрямний фокус пропускає вкладки"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le focus directionnel ignore les onglets"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Richtingsfocus slaat tabs over"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il focus direzionale salta le schede"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suuntakohdistus ohittaa välilehdet"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retningsfokus springer faner over"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "방향 포커스가 탭 건너뛰기"
+          }
+        }
+      }
+    },
+    "Focus arrows go straight to the neighboring tile; use Next / Previous Tab in Tile to switch tabs" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フォーカスの矢印キーで隣のタイルへ直接移動します。タブを切り替えるには「タイル内の次のタブ／前のタブ」を使用します"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Fokuspfeile springen direkt zur benachbarten Kachel; verwenden Sie „Nächster / Vorheriger Tab in Kachel“, um Tabs zu wechseln"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fokuspilene går rett til naboflisen; bruk Neste / Forrige fane i flis for å bytte fane"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fokuspilarna går direkt till grannrutan; använd Nästa / Föregående flik i rutan för att byta flik"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las flechas de foco van directamente al mosaico vecino; usa Siguiente / Pestaña anterior del mosaico para cambiar de pestaña"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "聚焦方向键会直接跳到相邻图块；使用“图块中的下一个 / 上一个标签页”切换标签页"
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "फ़ोकस तीर सीधे पड़ोसी टाइल पर जाते हैं; टैब बदलने के लिए टाइल में अगला / पिछला टैब उपयोग करें"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تنتقل أسهم التركيز مباشرةً إلى المربع المجاور؛ استخدم علامة التبويب التالية / السابقة في المربع للتبديل بين علامات التبويب"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Strelice fokusa idu direktno na susednu pločicu; koristite Sledeća / Prethodna kartica u pločici za promenu kartica"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Τα βέλη εστίασης μεταβαίνουν απευθείας στο γειτονικό πλακίδιο· χρησιμοποιήστε Επόμενη / Προηγούμενη καρτέλα στο πλακίδιο για εναλλαγή καρτελών"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "חיצי המיקוד עוברים ישירות לאריח השכן; השתמשו בכרטיסייה הבאה / הקודמת באריח כדי להחליף כרטיסיות"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Стрелки фокуса сразу переходят к соседней плитке; для переключения вкладок используйте «Следующая / Предыдущая вкладка в плитке»"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Strzałki fokusu przechodzą od razu do sąsiedniego kafelka; użyj Następna / Poprzednia karta w kafelku, aby przełączać karty"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Стрілки фокуса одразу переходять до сусідньої плитки; для перемикання вкладок використовуйте «Наступна / Попередня вкладка в плитці»"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les flèches de focus vont directement à la tuile voisine ; utilisez Onglet suivant / précédent dans la tuile pour changer d’onglet"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Focuspijlen gaan direct naar de naburige tegel; gebruik Volgende / Vorige tab in tegel om van tab te wisselen"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le frecce di focus passano direttamente al riquadro adiacente; usa Scheda successiva / precedente nel riquadro per cambiare scheda"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kohdistusnuolet siirtyvät suoraan viereiseen ruutuun; vaihda välilehteä komennoilla Ruudun seuraava / edellinen välilehti"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fokuspilene går direkte til naboflisen; brug Næste / Forrige fane i flise for at skifte fane"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "포커스 화살표는 이웃 타일로 바로 이동합니다. 탭을 전환하려면 타일의 다음 / 이전 탭을 사용하세요"
+          }
+        }
+      }
+    },
     "Keeps these margins for OmniWM Full Screen and the Single Window ‘Full Screen’ fit. Any active Workspace Bar reservation is also kept; native macOS Full Screen is unchanged." : {
       "localizations" : {
         "ja" : {

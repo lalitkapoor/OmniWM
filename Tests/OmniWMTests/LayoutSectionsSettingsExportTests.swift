@@ -35,7 +35,8 @@ final class LayoutSectionsSettingsExportTests: XCTestCase {
             "singleWindowFit": .string("fill"),
             "useGlobalGaps": .boolean(true),
             "moveToRootStable": .boolean(true),
-            "disableTabGroups": .boolean(false)
+            "disableTabGroups": .boolean(false),
+            "directionalFocusSkipsTabs": .boolean(false)
         ]))
         XCTAssertEqual(try SettingsTOMLCodec.decode(data), defaults)
     }

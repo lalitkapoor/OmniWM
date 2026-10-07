@@ -10,12 +10,14 @@ extension DwindleLayoutHandler {
         guard let controller else { return false }
         var didMove = false
         withDwindleContext { engine, wsId in
-            if focusGroupMember(
-                direction: direction,
-                wraps: false,
-                engine: engine,
-                workspaceId: wsId
-            ) {
+            if !controller.settings.dwindle.directionalFocusSkipsTabs,
+               focusGroupMember(
+                   direction: direction,
+                   wraps: false,
+                   engine: engine,
+                   workspaceId: wsId
+               )
+            {
                 didMove = true
                 return
             }

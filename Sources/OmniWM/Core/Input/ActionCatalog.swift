@@ -180,6 +180,7 @@ enum ActionCatalog {
         appendAxisResizeBindings(&specs)
         appendFocusedResizeBindings(&specs)
         appendPreselectionBindings(&specs)
+        appendTabInTileFocusBindings(&specs)
         appendPresentationBindings(&specs)
 
         return specs

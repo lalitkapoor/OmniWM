@@ -211,6 +211,10 @@ extension CommandHandler {
             controller.dwindleLayoutHandler.preselectInDwindle(direction: direction)
         case .preselectClear:
             controller.dwindleLayoutHandler.clearPreselectInDwindle()
+        case .focusNextTabInTile:
+            controller.dwindleLayoutHandler.wrapGroupFocus(direction: .down)
+        case .focusPreviousTabInTile:
+            controller.dwindleLayoutHandler.wrapGroupFocus(direction: .up)
         }
         return changed ? .executed : .noChange
     }
