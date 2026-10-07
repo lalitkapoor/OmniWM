@@ -12,6 +12,8 @@ enum DwindleAction: Equatable, Hashable {
     case resizeFocusedWindow(Bool)
     case preselect(Direction)
     case preselectClear
+    case focusNextTabInTile
+    case focusPreviousTabInTile
 }
 
 extension DwindleAction {
@@ -49,6 +51,16 @@ extension DwindleAction {
                 "command.dwindle.shrinkFocusedWindow", defaultValue: "Shrink Focused Window", table: "Commands",
                 bundle: .omniWM
             )
+        case .preselect,
+             .preselectClear,
+             .focusNextTabInTile,
+             .focusPreviousTabInTile:
+            selectionTitle()
+        }
+    }
+
+    private func selectionTitle() -> LocalizedStringResource {
+        switch self {
         case .preselect(.left): LocalizedStringResource(
                 "command.dwindle.preselectLeft", defaultValue: "Preselect Left", table: "Commands", bundle: .omniWM
             )
@@ -65,6 +77,20 @@ extension DwindleAction {
                 "command.dwindle.clearPreselection", defaultValue: "Clear Preselection", table: "Commands",
                 bundle: .omniWM
             )
+        case .focusNextTabInTile: LocalizedStringResource(
+                "command.dwindle.focusNextTabInTile", defaultValue: "Next Tab in Tile", table: "Commands",
+                bundle: .omniWM
+            )
+        case .focusPreviousTabInTile: LocalizedStringResource(
+                "command.dwindle.focusPreviousTabInTile", defaultValue: "Previous Tab in Tile", table: "Commands",
+                bundle: .omniWM
+            )
+        case .moveToRoot,
+             .toggleSplit,
+             .swapSplit,
+             .resizeAlongAxis,
+             .resizeFocusedWindow:
+            actionDisplayName()
         }
     }
 
@@ -84,6 +110,10 @@ extension DwindleAction {
             .dwindle(.preselect)
         case .preselectClear:
             .dwindle(.preselectClear)
+        case .focusNextTabInTile:
+            .dwindle(.focusNextTabInTile)
+        case .focusPreviousTabInTile:
+            .dwindle(.focusPreviousTabInTile)
         }
     }
 
@@ -95,7 +125,9 @@ extension DwindleAction {
              .resizeAlongAxis,
              .resizeFocusedWindow,
              .preselect,
-             .preselectClear:
+             .preselectClear,
+             .focusNextTabInTile,
+             .focusPreviousTabInTile:
             .dwindle
         }
     }

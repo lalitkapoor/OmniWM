@@ -144,6 +144,10 @@ extension HotkeyCommand {
             self = .dwindle(.preselect(Direction(ipc: ipcDirection)))
         case .preselectClear:
             self = .dwindle(.preselectClear)
+        case .focusNextTabInTile:
+            self = .dwindle(.focusNextTabInTile)
+        case .focusPreviousTabInTile:
+            self = .dwindle(.focusPreviousTabInTile)
         }
     }
 

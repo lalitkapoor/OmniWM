@@ -102,4 +102,25 @@ extension ActionCatalog {
             )
         ])
     }
+
+    static func appendTabInTileFocusBindings(_ specs: inout [ActionSpec]) {
+        specs.append(contentsOf: [
+            action(
+                id: "focusNextTabInTile",
+                command: .dwindle(.focusNextTabInTile),
+                category: .focus,
+                binding: .unassigned,
+                visibility: .advanced,
+                keywords: ["tab", "group", "cycle", "wrap"]
+            ),
+            action(
+                id: "focusPreviousTabInTile",
+                command: .dwindle(.focusPreviousTabInTile),
+                category: .focus,
+                binding: .unassigned,
+                visibility: .advanced,
+                keywords: ["tab", "group", "cycle", "wrap"]
+            )
+        ])
+    }
 }

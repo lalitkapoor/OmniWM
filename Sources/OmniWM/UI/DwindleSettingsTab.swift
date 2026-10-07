@@ -67,6 +67,11 @@ private struct GlobalDwindleSettingsSection: View {
                 localized: "Give every tiled window its own tile; Move swaps tiles instead of grouping them"
             )
 
+            Toggle("Directional Focus Skips Tabs", isOn: Bindable(settings.dwindle).directionalFocusSkipsTabs)
+            SettingsCaption(
+                localized: "Focus arrows go straight to the neighboring tile; use Next / Previous Tab in Tile to switch tabs"
+            )
+
             SettingsSliderRow(
                 label: String(localized: "Default Split Ratio"),
                 value: Bindable(settings.dwindle).defaultSplitRatio,
