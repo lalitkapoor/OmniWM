@@ -179,6 +179,7 @@ Options for the Dwindle (BSP) layout.
 | `singleWindowFit` | string | `"fill"` | Size of a lone window: `fill` (the "Full Screen" fit, which uses the fullscreen layout frame and honors `fullscreenUsesOuterGaps`) or `WIDTHxHEIGHT` (no span mode in Dwindle). |
 | `useGlobalGaps` | boolean | `true` | Uses the [`gaps`](#gaps) values; when `false`, the inner gap comes from a per-monitor `innerGap` override (falling back to `gaps.size`), clamped to the same 0–64 range as `gaps.size`. |
 | `moveToRootStable` | boolean | `true` | Keeps a window on the same screen side when moving it to the root. |
+| `disableTabGroups` *(optional)* | boolean | `false` | Gives every managed tiled window its own tile. Existing groups split into separate tiles on the next layout pass (windows keep their workspaces, and the active member keeps focus), and no new groups form from Move, IPC commands, or restored layouts. `Focus` is purely spatial, and `Move` swaps tiles like `Move Container`. Niri tabbed columns and native app tabs are unaffected. Settings > Dwindle Layout > Disable Tab Groups. |
 
 ## borders
 

@@ -71681,6 +71681,254 @@
         }
       }
     },
+    "Disable Tab Groups" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "タブグループを無効にする"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tab-Gruppen deaktivieren"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deaktiver fanegrupper"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inaktivera flikgrupper"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deshabilitar grupos de pestañas"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "禁用标签页组"
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "टैब समूह अक्षम करें"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعطيل مجموعات علامات التبويب"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Onemogući grupe kartica"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Απενεργοποίηση ομάδων καρτελών"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "בטל קבוצות כרטיסיות"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отключить группы вкладок"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wyłącz grupy kart"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вимкнути групи вкладок"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Désactiver les groupes d’onglets"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabgroepen uitschakelen"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disabilita i gruppi di schede"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Poista välilehtiryhmät käytöstä"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deaktivér fanegrupper"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "탭 그룹 비활성화"
+          }
+        }
+      }
+    },
+    "Give every tiled window its own tile; Move swaps tiles instead of grouping them" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "タイル配置されたすべてのウィンドウに専用のタイルを割り当てます。移動はグループ化せずにタイルを入れ替えます"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jedes gekachelte Fenster erhält eine eigene Kachel; Bewegen tauscht Kacheln, statt sie zu gruppieren"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gi hvert flislagte vindu sin egen flis; Flytt bytter plass på fliser i stedet for å gruppere dem"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ge varje kaklat fönster en egen ruta; Flytta byter plats på rutor i stället för att gruppera dem"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Da a cada ventana en mosaico su propio mosaico; Mover intercambia mosaicos en lugar de agruparlos"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "让每个平铺窗口都拥有独立的图块；“移动”会交换图块，而不是将其分组"
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "हर टाइल की गई विंडो को उसकी अपनी टाइल दें; ले जाएँ टाइलों को समूह बनाने के बजाय आपस में बदलता है"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "امنح كل نافذة متجانبة مربعها الخاص؛ يبدّل النقل مواضع المربعات بدلاً من تجميعها"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Svaki popločani prozor dobija sopstvenu pločicu; Premesti menja mesta pločicama umesto da ih grupiše"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Κάθε παράθυρο σε παράθεση αποκτά δικό του πλακίδιο· η Μετακίνηση ανταλλάσσει πλακίδια αντί να τα ομαδοποιεί"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "כל חלון מרוצף מקבל אריח משלו; העברה מחליפה בין אריחים במקום לקבץ אותם"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Каждое мозаичное окно получает собственную плитку; перемещение меняет плитки местами, а не группирует их"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Każde okno ułożone kafelkowo otrzymuje własny kafelek; Przenieś zamienia kafelki miejscami zamiast je grupować"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кожне вікно в мозаїці отримує власну плитку; переміщення міняє плитки місцями, а не групує їх"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chaque fenêtre en mosaïque obtient sa propre tuile ; Déplacer permute les tuiles au lieu de les regrouper"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geef elk getegeld venster een eigen tegel; Verplaatsen wisselt tegels in plaats van ze te groeperen"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Assegna a ogni finestra affiancata un proprio riquadro; Sposta scambia i riquadri invece di raggrupparli"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jokainen laatoitettu ikkuna saa oman ruutunsa; Siirrä vaihtaa ruutujen paikkoja ryhmittelyn sijaan"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Giv hvert flisebelagt vindue sin egen flise; Flyt bytter om på fliser i stedet for at gruppere dem"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "모든 타일 창에 고유한 타일을 지정합니다. 이동은 창을 그룹으로 묶지 않고 타일 위치를 바꿉니다"
+          }
+        }
+      }
+    },
     "Keeps these margins for OmniWM Full Screen and the Single Window ‘Full Screen’ fit. Any active Workspace Bar reservation is also kept; native macOS Full Screen is unchanged." : {
       "localizations" : {
         "ja" : {
