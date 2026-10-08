@@ -69,6 +69,7 @@ preselect
 preselect-clear
 focus-next-tab-in-tile
 focus-previous-tab-in-tile
+move-edge
 open-command-palette
 open-command-palette-mode
 raise-all-floating-windows

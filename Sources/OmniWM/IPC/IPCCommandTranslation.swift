@@ -148,6 +148,8 @@ extension HotkeyCommand {
             self = .dwindle(.focusNextTabInTile)
         case .focusPreviousTabInTile:
             self = .dwindle(.focusPreviousTabInTile)
+        case let .moveEdge(ipcDirection):
+            self = .dwindle(.moveEdge(Direction(ipc: ipcDirection)))
         }
     }
 

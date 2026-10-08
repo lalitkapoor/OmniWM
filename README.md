@@ -882,6 +882,8 @@ With **Settings > Dwindle Layout > Directional Focus Skips Tabs** (`dwindle.dire
 
 In Dwindle, **Grow / Shrink Focused Window** and **Grow / Shrink Horizontally / Vertically** move the window's right edge (bottom edge for height) by 5% of the screen per step. Growing takes the space equally from the windows on that side that are still above their minimum size; shrinking gives it equally to them. Windows to the left (or above) never change, so a window with nothing on that side, or with everything there at its minimum, does not resize: shrink the window on the other side instead.
 
+**Move Edge Left / Right / Up / Down** (unassigned; for example Control + Option + Arrow Keys) move one border of the focused window in the arrow's direction: its right (bottom) edge when a window sits on that side, otherwise its left (top) edge. The window grows when that edge moves outward and shrinks when it moves inward, and the windows on that edge's side share the change equally, so every window can be resized, including one in the bottom-right corner.
+
 | Goal | Default Shortcut | Behavior |
 |------|------------------|----------|
 | Focus another tile | `Option + Arrow Keys` | Left / Right are always spatial. Up / Down are spatial for a singleton tile. |

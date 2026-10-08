@@ -32,6 +32,49 @@ extension DwindleLayoutEngine {
         return resize(selected, by: delta, orientation: orientation, state: state)
     }
 
+    /// Moves a border of the selected window in `direction`: its right edge (bottom edge for height)
+    /// when a window sits on that side, otherwise its left (top) edge. The window grows when that edge
+    /// moves outward and shrinks when it moves inward; only the windows on that edge's side change.
+    @discardableResult
+    func moveEdge(_ direction: Direction, by step: CGFloat, in workspaceId: WorkspaceDescriptor.ID) -> Bool {
+        assertSanctionedMutation()
+        guard let state = existingState(for: workspaceId),
+              let selected = selectedNode(in: workspaceId)
+        else { return false }
+        let axis = direction.dwindleOrientation
+        // Layout y grows upward, so the bottom neighbor is the first child of a vertical split.
+        let farNeighborIsFirst = axis == .vertical
+        let farDirection: Direction = axis == .horizontal ? .right : .down
+        let movesFarEdge = hasNeighbor(of: selected, neighborIsFirst: farNeighborIsFirst, axis: axis, state: state)
+        let growing = (direction == farDirection) == movesFarEdge
+        return resize(
+            selected,
+            by: growing ? abs(step) : -abs(step),
+            orientation: axis,
+            neighborIsFirst: movesFarEdge ? farNeighborIsFirst : !farNeighborIsFirst,
+            state: state
+        )
+    }
+
+    private func hasNeighbor(
+        of leaf: DwindleNode,
+        neighborIsFirst: Bool,
+        axis: DwindleOrientation,
+        state: DwindleWorkspaceState
+    ) -> Bool {
+        var current = leaf
+        while let parent = current.parent {
+            if parent.splitOrientation == axis,
+               splitHasTwoVisibleBranches(parent, excluding: state.excludedTokens),
+               current.isFirstChild(of: parent) != neighborIsFirst
+            {
+                return true
+            }
+            current = parent
+        }
+        return false
+    }
+
     /// Resizes the window at `leaf` by moving its right edge (bottom edge for height) along `axis`.
     /// Growing takes space equally from the windows on that side that can give; shrinking gives the
     /// space equally to them. Windows on the other side never change, so a window with nothing on that
@@ -41,6 +84,7 @@ extension DwindleLayoutEngine {
         _ leaf: DwindleNode,
         by delta: CGFloat,
         orientation axis: DwindleOrientation,
+        neighborIsFirst: Bool? = nil,
         state: DwindleWorkspaceState
     ) -> Bool {
         guard delta != 0,
@@ -52,7 +96,13 @@ extension DwindleLayoutEngine {
         collectSlotLengths(of: state.root, in: rootFrame, axis: axis, into: &slots)
         var edit = DwindleEdgeResize(axis: axis, excludedTokens: state.excludedTokens, slots: slots)
         // Layout y grows upward, so the bottom neighbor is the first child of a vertical split.
-        let moved = moveEdge(of: leaf, by: amount, growing: delta > 0, neighborIsFirst: axis == .vertical, edit: &edit)
+        let moved = moveEdge(
+            of: leaf,
+            by: amount,
+            growing: delta > 0,
+            neighborIsFirst: neighborIsFirst ?? (axis == .vertical),
+            edit: &edit
+        )
         guard moved > 0.5 else { return false }
         let previousRatios = edit.touchedSplits.map { ($0, $0.kind) }
         guard applyRatios(of: edit) else { return false }

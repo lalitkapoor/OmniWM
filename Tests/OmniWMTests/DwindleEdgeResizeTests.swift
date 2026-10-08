@@ -182,6 +182,111 @@ final class DwindleEdgeResizeTests: XCTestCase {
         XCTAssertEqual(frames(fixture).t, before.t)
     }
 
+    // MARK: - Move Edge Left / Right / Up / Down
+
+    func testMoveEdgeRightAndLeftMoveTheRightEdgeWhenThereIsAWindowOnTheRight() throws {
+        let fixture = try makeFixture(extract: .right)
+        let before = frames(fixture)
+
+        XCTAssertTrue(fixture.engine.moveEdge(.right, by: 0.1, in: fixture.ws))
+        let grown = frames(fixture)
+        XCTAssertEqual(grown.b.minX, before.b.minX, accuracy: 0.5)
+        XCTAssertGreaterThan(grown.b.width, before.b.width + 20)
+        XCTAssertLessThan(grown.c.width, before.c.width - 20)
+        XCTAssertEqual(grown.a, before.a)
+        XCTAssertEqual(grown.l, before.l)
+
+        XCTAssertTrue(fixture.engine.moveEdge(.left, by: 0.1, in: fixture.ws))
+        let shrunk = frames(fixture)
+        XCTAssertEqual(shrunk.b.minX, before.b.minX, accuracy: 0.5)
+        XCTAssertEqual(shrunk.b.width, before.b.width, accuracy: 1)
+        XCTAssertEqual(shrunk.c.width, before.c.width, accuracy: 1)
+        XCTAssertEqual(shrunk.a, before.a)
+        XCTAssertEqual(shrunk.l, before.l)
+    }
+
+    func testMoveEdgeLeftGrowsTheRightmostWindowFromItsLeftEdge() throws {
+        let fixture = try makeFixture(extract: .right)
+        fixture.engine.setSelectedNode(fixture.engine.findNode(for: fixture.c, in: fixture.ws), in: fixture.ws)
+        let before = frames(fixture)
+        XCTAssertEqual(before.a.width, Self.aMinWidth, accuracy: 1, "A has nothing to give")
+
+        XCTAssertTrue(fixture.engine.moveEdge(.left, by: 0.1, in: fixture.ws))
+
+        let after = frames(fixture)
+        let bGave = before.b.width - after.b.width
+        let lGave = before.l.width - after.l.width
+        XCTAssertEqual(after.c.maxX, before.c.maxX, accuracy: 0.5, "the right edge stays at the screen edge")
+        XCTAssertGreaterThan(bGave, 10)
+        XCTAssertEqual(bGave, lGave, accuracy: 1)
+        XCTAssertEqual(after.c.width - before.c.width, bGave + lGave, accuracy: 1)
+        XCTAssertEqual(after.a.width, before.a.width, accuracy: 1)
+    }
+
+    func testMoveEdgeRightShrinksTheRightmostWindowGivingEquallyToTheLeft() throws {
+        let fixture = try makeFixture(extract: .right, aMinWidth: 1)
+        fixture.engine.setSelectedNode(fixture.engine.findNode(for: fixture.c, in: fixture.ws), in: fixture.ws)
+        let before = frames(fixture)
+
+        XCTAssertTrue(fixture.engine.moveEdge(.right, by: 0.1, in: fixture.ws))
+
+        let after = frames(fixture)
+        let gains = [after.a.width - before.a.width, after.b.width - before.b.width, after.l.width - before.l.width]
+        XCTAssertEqual(after.c.maxX, before.c.maxX, accuracy: 0.5)
+        XCTAssertLessThan(after.c.width, before.c.width - 20)
+        for gain in gains {
+            XCTAssertEqual(gain, gains[0], accuracy: 1)
+            XCTAssertGreaterThan(gain, 5)
+        }
+    }
+
+    func testMoveEdgeDownAndUpMoveTheBottomEdgeWhenThereIsAWindowBelow() throws {
+        let fixture = try makeFixture(extract: .right)
+        fixture.engine.setSelectedNode(fixture.engine.findNode(for: fixture.t, in: fixture.ws), in: fixture.ws)
+        let before = frames(fixture)
+
+        XCTAssertTrue(fixture.engine.moveEdge(.down, by: 0.1, in: fixture.ws))
+        let grown = frames(fixture)
+        XCTAssertEqual(grown.t.maxY, before.t.maxY, accuracy: 0.5, "T's top edge stays put")
+        XCTAssertGreaterThan(grown.t.height, before.t.height + 20)
+        XCTAssertLessThan(grown.b.height, before.b.height - 20)
+
+        XCTAssertTrue(fixture.engine.moveEdge(.up, by: 0.1, in: fixture.ws))
+        XCTAssertEqual(frames(fixture).t.height, before.t.height, accuracy: 1)
+        XCTAssertEqual(frames(fixture).l, before.l)
+    }
+
+    func testMoveEdgeUpGrowsTheBottomRowFromItsTopEdge() throws {
+        let fixture = try makeFixture(extract: .right)
+        let before = frames(fixture)
+
+        XCTAssertTrue(fixture.engine.moveEdge(.up, by: 0.1, in: fixture.ws))
+
+        let after = frames(fixture)
+        XCTAssertEqual(after.b.minY, before.b.minY, accuracy: 0.5, "the row's bottom edge stays at the screen edge")
+        XCTAssertGreaterThan(after.b.height, before.b.height + 20)
+        XCTAssertLessThan(after.t.height, before.t.height - 20)
+        XCTAssertEqual(after.l, before.l)
+    }
+
+    func testMoveEdgeDoesNothingWithoutANeighborOnThatAxis() throws {
+        let engine = DwindleLayoutEngine()
+        let ws = WorkspaceDescriptor.ID()
+        let only = WindowToken(pid: 1, windowId: 1)
+        _ = engine.addWindow(token: only, to: ws, activeWindowFrame: nil)
+        _ = engine.calculateLayout(for: ws, screen: screen)
+        engine.setSelectedNode(engine.findNode(for: only, in: ws), in: ws)
+
+        for direction in [Direction.left, .right, .up, .down] {
+            XCTAssertFalse(engine.moveEdge(direction, by: 0.1, in: ws), direction.rawValue)
+        }
+
+        let fixture = try makeFixture(extract: .right)
+        fixture.engine.setSelectedNode(fixture.engine.findNode(for: fixture.l, in: fixture.ws), in: fixture.ws)
+        XCTAssertFalse(fixture.engine.moveEdge(.up, by: 0.1, in: fixture.ws), "L spans the full height")
+        XCTAssertFalse(fixture.engine.moveEdge(.down, by: 0.1, in: fixture.ws), "L spans the full height")
+    }
+
     // MARK: - Fixture
 
     private static let aMinWidth: CGFloat = 260

@@ -82,4 +82,25 @@ final class DwindleResizeCommandContractTests: XCTestCase {
             XCTAssertNil(ActionCatalog.spec(for: id))
         }
     }
+
+    func testMoveEdgeActionsAreAssignableDwindleCommandsWithDirectionalIPC() throws {
+        let cases: [(Direction, String, String, IPCDirection)] = [
+            (.left, "moveEdge.left", "Move Edge Left", .left),
+            (.right, "moveEdge.right", "Move Edge Right", .right),
+            (.up, "moveEdge.up", "Move Edge Up", .up),
+            (.down, "moveEdge.down", "Move Edge Down", .down)
+        ]
+        for (direction, id, title, ipcDirection) in cases {
+            let spec = try XCTUnwrap(ActionCatalog.spec(for: id))
+            XCTAssertEqual(spec.command, .dwindle(.moveEdge(direction)))
+            XCTAssertEqual(spec.title, title)
+            XCTAssertEqual(spec.category, .layout)
+            XCTAssertEqual(spec.layoutCompatibility, .dwindle)
+            XCTAssertEqual(spec.defaultBinding, .unassigned)
+            XCTAssertEqual(spec.ipcCommandName, .dwindle(.moveEdge))
+            XCTAssertNotNil(spec.ipcDescriptor)
+            XCTAssertEqual(HotkeyCommand(ipc: IPCDwindleCommand.moveEdge(direction: ipcDirection)), spec.command)
+        }
+        XCTAssertEqual(IPCDwindleCommandName.moveEdge.rawValue, "move-edge")
+    }
 }

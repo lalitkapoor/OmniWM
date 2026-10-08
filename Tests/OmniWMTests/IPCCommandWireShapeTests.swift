@@ -125,6 +125,7 @@ final class IPCCommandWireShapeTests: XCTestCase {
         #"{"name":"preselect-clear"}"#,
         #"{"name":"focus-next-tab-in-tile"}"#,
         #"{"name":"focus-previous-tab-in-tile"}"#,
+        #"{"arguments":{"direction":"left"},"name":"move-edge"}"#,
         #"{"name":"open-command-palette"}"#,
         #"{"arguments":{"mode":"clipboard"},"name":"open-command-palette-mode"}"#,
         #"{"name":"raise-all-floating-windows"}"#,

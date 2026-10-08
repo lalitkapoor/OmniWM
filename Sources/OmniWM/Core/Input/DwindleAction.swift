@@ -14,6 +14,7 @@ enum DwindleAction: Equatable, Hashable {
     case preselectClear
     case focusNextTabInTile
     case focusPreviousTabInTile
+    case moveEdge(Direction)
 }
 
 extension DwindleAction {
@@ -56,6 +57,25 @@ extension DwindleAction {
              .focusNextTabInTile,
              .focusPreviousTabInTile:
             selectionTitle()
+        case let .moveEdge(direction):
+            edgeTitle(direction)
+        }
+    }
+
+    private func edgeTitle(_ direction: Direction) -> LocalizedStringResource {
+        switch direction {
+        case .left: LocalizedStringResource(
+                "command.dwindle.moveEdgeLeft", defaultValue: "Move Edge Left", table: "Commands", bundle: .omniWM
+            )
+        case .right: LocalizedStringResource(
+                "command.dwindle.moveEdgeRight", defaultValue: "Move Edge Right", table: "Commands", bundle: .omniWM
+            )
+        case .up: LocalizedStringResource(
+                "command.dwindle.moveEdgeUp", defaultValue: "Move Edge Up", table: "Commands", bundle: .omniWM
+            )
+        case .down: LocalizedStringResource(
+                "command.dwindle.moveEdgeDown", defaultValue: "Move Edge Down", table: "Commands", bundle: .omniWM
+            )
         }
     }
 
@@ -89,7 +109,8 @@ extension DwindleAction {
              .toggleSplit,
              .swapSplit,
              .resizeAlongAxis,
-             .resizeFocusedWindow:
+             .resizeFocusedWindow,
+             .moveEdge:
             actionDisplayName()
         }
     }
@@ -114,6 +135,8 @@ extension DwindleAction {
             .dwindle(.focusNextTabInTile)
         case .focusPreviousTabInTile:
             .dwindle(.focusPreviousTabInTile)
+        case .moveEdge:
+            .dwindle(.moveEdge)
         }
     }
 
@@ -127,7 +150,8 @@ extension DwindleAction {
              .preselect,
              .preselectClear,
              .focusNextTabInTile,
-             .focusPreviousTabInTile:
+             .focusPreviousTabInTile,
+             .moveEdge:
             .dwindle
         }
     }
