@@ -139,7 +139,8 @@ final class DwindleMinimumSizeTests: XCTestCase {
         engine.setSelectedNode(engine.findNode(for: first, in: ws), in: ws)
         XCTAssertTrue(engine.resizeFocusedWindow(by: 0.1, in: ws))
         XCTAssertTrue(engine.resizeFocusedWindow(by: 0.1, in: ws))
-        XCTAssertEqual(engine.root(for: ws)?.splitRatio ?? 0, 1.508, accuracy: 1e-6)
+        // Each step grows from the rendered minimum-feasible ratio (1.408), not the stored 1.0.
+        XCTAssertEqual(engine.root(for: ws)?.splitRatio ?? 0, 1.608, accuracy: 1e-6)
 
         XCTAssertTrue(engine.balanceSizes(in: ws))
         XCTAssertEqual(engine.root(for: ws)?.splitRatio ?? 0, 1.408, accuracy: 1e-6)
