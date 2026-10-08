@@ -181,6 +181,7 @@ enum ActionCatalog {
         appendFocusedResizeBindings(&specs)
         appendPreselectionBindings(&specs)
         appendTabInTileFocusBindings(&specs)
+        appendEdgeMoveBindings(&specs)
         appendPresentationBindings(&specs)
 
         return specs

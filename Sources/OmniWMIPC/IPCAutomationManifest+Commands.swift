@@ -385,6 +385,12 @@ extension IPCAutomationManifest {
             layoutCompatibility: .dwindle
         ),
         .init(
+            name: .dwindle(.moveEdge),
+            summary: "Move a border of the focused Dwindle window in a direction: its right (bottom) edge when a window is on that side, otherwise its left (top) edge.",
+            arguments: [.direction],
+            layoutCompatibility: .dwindle
+        ),
+        .init(
             name: .openCommandPalette,
             summary: "Toggle the command palette."
         ),

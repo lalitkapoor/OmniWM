@@ -173,6 +173,7 @@ Workspace IDs are global, so `switch-workspace 3` targets workspace `3` wherever
 | `command swap-split` | — | dwindle | Swap the active split |
 | `command resize` | `<horizontal\|vertical> <grow\|shrink>` | dwindle | Grow or shrink the selected window along an axis |
 | `command resize-focused` | `<grow\|shrink>` | dwindle | Grow or shrink the focused window |
+| `command move-edge` | `<left\|right\|up\|down>` | dwindle | Move a border of the focused window in that direction: its right (bottom) edge when a window is on that side, otherwise its left (top) edge |
 | `command preselect` | `<left\|right\|up\|down>` | dwindle | Set the preselection direction |
 | `command preselect clear` | — | dwindle | Clear the preselection |
 | `command focus-next-tab-in-tile` | — | dwindle | Focus the next eligible tab in the focused tile, wrapping locally; never leaves the tile |

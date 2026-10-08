@@ -776,6 +776,7 @@ When you create workspace 10 or higher, Settings > Hotkeys adds its Switch, Move
 |--------|------------------|--------|
 | Focus Left / Right / Up / Down | `Option + Arrow Keys` | `Shared` |
 | Focus Next / Previous Window (Wrap) | `Unassigned` | `Shared` |
+| Next / Previous Tab in Tile | `Unassigned` | `Dwindle` |
 | Focus First / Last Window in Column | `Unassigned` | `Niri` |
 | Focus Window or Workspace Down / Up | `Unassigned` | `Niri` |
 | Focus Previously Focused Window | `Option + Tab` | `Shared` |
@@ -837,6 +838,7 @@ The window-to-monitor actions send the focused window directly to the current wo
 | Grow Horizontally / Vertically | `Unassigned` | `Dwindle` |
 | Shrink Horizontally / Vertically | `Unassigned` | `Dwindle` |
 | Grow / Shrink Focused Window | `Unassigned` | `Dwindle` |
+| Move Edge Left / Right / Up / Down | `Unassigned` | `Dwindle` |
 | Preselect Left / Right / Up / Down | `Unassigned` | `Dwindle` |
 | Clear Preselection | `Unassigned` | `Dwindle` |
 | Raise All Floating Windows | `Option + Shift + R` | `Shared` |
@@ -879,6 +881,8 @@ Dwindle groups use the existing Focus and Move bindings, so there are no separat
 With **Settings > Dwindle Layout > Disable Tab Groups** (`dwindle.disableTabGroups = true`), Dwindle never forms groups: existing groups split into separate tiles, `Focus` moves spatially between tiles without visiting tabs, and `Move` swaps the focused tile with its neighbor exactly like `Move Container`.
 
 With **Settings > Dwindle Layout > Directional Focus Skips Tabs** (`dwindle.directionalFocusSkipsTabs = true`), `Focus` in every direction goes straight to the neighboring tile, keeping that tile's active tab; at an edge it only tries the monitor transition and never cycles or wraps tabs. Assign **Next Tab in Tile** and **Previous Tab in Tile** in Settings > Hotkeys to cycle the focused tile's tabs; they wrap locally and never leave the tile.
+
+**Move Edge Left / Right / Up / Down** (unassigned; for example Control + Option + Arrow Keys) move one border of the focused window in the arrow's direction: its right (bottom) edge when a window sits on that side, otherwise its left (top) edge. The window grows when that edge moves outward and shrinks when it moves inward, and the windows on that edge's side share the change equally (growing takes only from windows still above their minimum size). Each step is 5% of the screen, and a window with a neighbor on its right never changes the windows on its left, while a window in the bottom-right corner can still grow by moving its left or top edge.
 
 | Goal | Default Shortcut | Behavior |
 |------|------------------|----------|

@@ -215,6 +215,8 @@ extension CommandHandler {
             controller.dwindleLayoutHandler.wrapGroupFocus(direction: .down)
         case .focusPreviousTabInTile:
             controller.dwindleLayoutHandler.wrapGroupFocus(direction: .up)
+        case let .moveEdge(direction):
+            controller.dwindleLayoutHandler.moveEdgeInDwindle(direction: direction)
         }
         return changed ? .executed : .noChange
     }

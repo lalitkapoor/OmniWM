@@ -123,4 +123,17 @@ extension ActionCatalog {
             )
         ])
     }
+
+    static func appendEdgeMoveBindings(_ specs: inout [ActionSpec]) {
+        specs.append(contentsOf: [Direction.left, .right, .up, .down].map { direction in
+            action(
+                id: "moveEdge.\(direction.rawValue)",
+                command: .dwindle(.moveEdge(direction)),
+                category: .layout,
+                binding: .unassigned,
+                visibility: .advanced,
+                keywords: ["resize", "edge", "border", "grow", "shrink"]
+            )
+        })
+    }
 }

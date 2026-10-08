@@ -12,6 +12,7 @@ public enum IPCDwindleCommandName: String, CaseIterable, Hashable, Sendable {
     case preselectClear = "preselect-clear"
     case focusNextTabInTile = "focus-next-tab-in-tile"
     case focusPreviousTabInTile = "focus-previous-tab-in-tile"
+    case moveEdge = "move-edge"
 }
 
 public enum IPCDwindleCommand: Equatable, Sendable {
@@ -25,6 +26,7 @@ public enum IPCDwindleCommand: Equatable, Sendable {
     case preselectClear
     case focusNextTabInTile
     case focusPreviousTabInTile
+    case moveEdge(direction: IPCDirection)
 
     public var name: IPCDwindleCommandName {
         switch self {
@@ -48,6 +50,8 @@ public enum IPCDwindleCommand: Equatable, Sendable {
             .focusNextTabInTile
         case .focusPreviousTabInTile:
             .focusPreviousTabInTile
+        case .moveEdge:
+            .moveEdge
         }
     }
 
@@ -74,6 +78,8 @@ public enum IPCDwindleCommand: Equatable, Sendable {
             self = try arguments.requireNoArguments(.focusNextTabInTile)
         case .focusPreviousTabInTile:
             self = try arguments.requireNoArguments(.focusPreviousTabInTile)
+        case .moveEdge:
+            self = try .moveEdge(direction: arguments.direction())
         }
     }
 
@@ -83,7 +89,8 @@ public enum IPCDwindleCommand: Equatable, Sendable {
             try writer.encode(axis: axis, operation: operation)
         case let .resizeFocused(operation):
             try writer.encode(resizeOperation: operation)
-        case let .preselect(direction):
+        case let .preselect(direction),
+             let .moveEdge(direction):
             try writer.encode(direction: direction)
         case .balanceSizes,
              .moveToRoot,
