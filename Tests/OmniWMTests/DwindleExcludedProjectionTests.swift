@@ -179,7 +179,7 @@ final class DwindleExcludedProjectionTests: XCTestCase {
         )
         engine.setExcludedTokens([hidden], in: workspaceId)
         _ = engine.calculateLayout(for: workspaceId, screen: screen)
-        engine.setSelectedNode(engine.findNode(for: second, in: workspaceId), in: workspaceId)
+        engine.setSelectedNode(engine.findNode(for: first, in: workspaceId), in: workspaceId)
         let root = try XCTUnwrap(engine.root(for: workspaceId))
         let before = try XCTUnwrap(root.splitRatio)
 

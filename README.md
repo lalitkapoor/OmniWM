@@ -880,6 +880,8 @@ With **Settings > Dwindle Layout > Disable Tab Groups** (`dwindle.disableTabGrou
 
 With **Settings > Dwindle Layout > Directional Focus Skips Tabs** (`dwindle.directionalFocusSkipsTabs = true`), `Focus` in every direction goes straight to the neighboring tile, keeping that tile's active tab; at an edge it only tries the monitor transition and never cycles or wraps tabs. Assign **Next Tab in Tile** and **Previous Tab in Tile** in Settings > Hotkeys to cycle the focused tile's tabs; they wrap locally and never leave the tile.
 
+In Dwindle, **Grow / Shrink Focused Window** and **Grow / Shrink Horizontally / Vertically** move the window's right edge (bottom edge for height) by 5% of the screen per step. Growing takes the space equally from the windows on that side that are still above their minimum size; shrinking gives it equally to them. Windows to the left (or above) never change, so a window with nothing on that side, or with everything there at its minimum, does not resize: shrink the window on the other side instead.
+
 | Goal | Default Shortcut | Behavior |
 |------|------------------|----------|
 | Focus another tile | `Option + Arrow Keys` | Left / Right are always spatial. Up / Down are spatial for a singleton tile. |

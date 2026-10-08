@@ -42,7 +42,7 @@ final class DwindleEdgeResizeTests: XCTestCase {
         XCTAssertLessThan(after.c.width, before.c.width - 20)
     }
 
-    func testGrowTakesFromNearestRightNeighborFirst() throws {
+    func testGrowTakesEquallyFromEveryWindowToTheRight() throws {
         let fixture = try makeFixture(extract: .left, aMinWidth: 1)
         let before = frames(fixture)
         XCTAssertLessThan(before.b.maxX, before.a.minX, "B sits left of A")
@@ -50,10 +50,14 @@ final class DwindleEdgeResizeTests: XCTestCase {
         XCTAssertTrue(fixture.engine.resizeFocusedWindow(by: 0.1, in: fixture.ws))
 
         let after = frames(fixture)
+        let aGave = before.a.width - after.a.width
+        let cGave = before.c.width - after.c.width
         XCTAssertEqual(after.b.minX, before.b.minX, accuracy: 0.5)
-        XCTAssertGreaterThan(after.b.width, before.b.width + 20)
-        XCTAssertLessThan(after.a.width, before.a.width - 20)
-        XCTAssertEqual(after.c, before.c)
+        XCTAssertGreaterThan(aGave, 20)
+        XCTAssertEqual(aGave, cGave, accuracy: 1)
+        XCTAssertEqual(after.b.width - before.b.width, aGave + cGave, accuracy: 1)
+        XCTAssertEqual(after.c.maxX, before.c.maxX, accuracy: 0.5)
+        XCTAssertEqual(after.l, before.l)
     }
 
     func testGrowSkipsNeighborAtItsMinimumAndTakesFromTheNextOne() throws {
@@ -71,38 +75,24 @@ final class DwindleEdgeResizeTests: XCTestCase {
         XCTAssertEqual(after.c.maxX, before.c.maxX, accuracy: 0.5)
     }
 
-    func testGrowFallsBackToTheLeftOnlyWhenTheRightHasNothingLeft() throws {
-        let aMinWidth: CGFloat = 150
-        let fixture = try makeFixture(extract: .right, aMinWidth: aMinWidth)
-        var previous = frames(fixture)
-        XCTAssertGreaterThan(previous.a.width, aMinWidth + 20, "A starts with room to give")
-        var changedWindows: [String] = []
+    func testGrowStopsWhenEverythingToTheRightIsAtItsMinimumAndNeverTouchesTheLeft() throws {
+        let fixture = try makeFixture(extract: .right, aMinWidth: 150)
+        let start = frames(fixture)
         var steps = 0
         while fixture.engine.resizeFocusedWindow(by: 0.1, in: fixture.ws), steps < 50 {
             let current = frames(fixture)
-            XCTAssertGreaterThan(current.b.width, previous.b.width, "step \(steps)")
-            if abs(current.a.width - previous.a.width) > 0.5 {
-                XCTAssertEqual(current.c.width, Self.cMinWidth, accuracy: 1, "A gives only once C is at its minimum")
-                changedWindows.append("A")
-            }
-            if abs(current.l.width - previous.l.width) > 0.5 {
-                XCTAssertEqual(current.a.width, aMinWidth, accuracy: 1, "L gives only once A is at its minimum")
-                changedWindows.append("L")
-            }
-            if abs(current.c.width - previous.c.width) > 0.5 {
-                XCTAssertFalse(changedWindows.contains("A") || changedWindows.contains("L"), "C gives first")
-                changedWindows.append("C")
-            }
-            previous = current
+            XCTAssertEqual(current.a, start.a, "step \(steps)")
+            XCTAssertEqual(current.l, start.l, "step \(steps)")
             steps += 1
         }
 
+        XCTAssertGreaterThan(steps, 0)
         XCTAssertLessThan(steps, 50)
-        XCTAssertEqual(changedWindows.first, "C")
-        XCTAssertTrue(changedWindows.contains("A"))
-        XCTAssertTrue(changedWindows.contains("L"))
-        XCTAssertEqual(previous.c.width, Self.cMinWidth, accuracy: 1)
-        XCTAssertEqual(previous.a.width, aMinWidth, accuracy: 1)
+        let final = frames(fixture)
+        XCTAssertEqual(final.c.width, Self.cMinWidth, accuracy: 1)
+        XCTAssertEqual(final.a, start.a)
+        XCTAssertEqual(final.l, start.l)
+        XCTAssertFalse(fixture.engine.resizeFocusedWindow(by: 0.1, in: fixture.ws))
     }
 
     // MARK: - Shrinking pulls the right edge in
@@ -120,23 +110,40 @@ final class DwindleEdgeResizeTests: XCTestCase {
         XCTAssertEqual(before.b.width - after.b.width, after.c.width - before.c.width, accuracy: 1)
     }
 
+    func testShrinkGivesSpaceEquallyToEveryWindowToTheRight() throws {
+        let fixture = try makeFixture(extract: .left, aMinWidth: 1)
+        let before = frames(fixture)
+
+        XCTAssertTrue(fixture.engine.resizeFocusedWindow(by: -0.1, in: fixture.ws))
+
+        let after = frames(fixture)
+        let aGained = after.a.width - before.a.width
+        let cGained = after.c.width - before.c.width
+        XCTAssertEqual(after.b.minX, before.b.minX, accuracy: 0.5)
+        XCTAssertGreaterThan(aGained, 10)
+        XCTAssertEqual(aGained, cGained, accuracy: 1)
+        XCTAssertEqual(before.b.width - after.b.width, aGained + cGained, accuracy: 1)
+        XCTAssertEqual(after.l, before.l)
+    }
+
     // MARK: - Fallbacks and other axes
 
-    func testRightmostWindowGrowsLeftTakingFromNearestNeighborFirst() throws {
+    func testRightmostWindowNeverResizesIntoTheLeft() throws {
         let fixture = try makeFixture(extract: .right)
         fixture.engine.setSelectedNode(fixture.engine.findNode(for: fixture.c, in: fixture.ws), in: fixture.ws)
         let before = frames(fixture)
 
-        XCTAssertTrue(fixture.engine.resizeFocusedWindow(by: 0.1, in: fixture.ws))
+        XCTAssertFalse(fixture.engine.resizeFocusedWindow(by: 0.1, in: fixture.ws))
+        XCTAssertFalse(fixture.engine.resizeFocusedWindow(by: -0.1, in: fixture.ws))
 
         let after = frames(fixture)
-        XCTAssertEqual(after.c.maxX, before.c.maxX, accuracy: 0.5)
-        XCTAssertGreaterThan(after.c.width, before.c.width + 20)
-        XCTAssertLessThan(after.b.width, before.b.width - 20)
         XCTAssertEqual(after.a, before.a)
+        XCTAssertEqual(after.b, before.b)
+        XCTAssertEqual(after.c, before.c)
+        XCTAssertEqual(after.l, before.l)
     }
 
-    func testHeightGrowPushesTheBottomEdgeFirst() throws {
+    func testHeightGrowPushesTheBottomEdge() throws {
         let fixture = try makeFixture(extract: .right)
         fixture.engine.setSelectedNode(fixture.engine.findNode(for: fixture.t, in: fixture.ws), in: fixture.ws)
         let before = frames(fixture)
