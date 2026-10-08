@@ -776,6 +776,7 @@ When you create workspace 10 or higher, Settings > Hotkeys adds its Switch, Move
 |--------|------------------|--------|
 | Focus Left / Right / Up / Down | `Option + Arrow Keys` | `Shared` |
 | Focus Next / Previous Window (Wrap) | `Unassigned` | `Shared` |
+| Next / Previous Tab in Tile | `Unassigned` | `Dwindle` |
 | Focus First / Last Window in Column | `Unassigned` | `Niri` |
 | Focus Window or Workspace Down / Up | `Unassigned` | `Niri` |
 | Focus Previously Focused Window | `Option + Tab` | `Shared` |
@@ -837,6 +838,7 @@ The window-to-monitor actions send the focused window directly to the current wo
 | Grow Horizontally / Vertically | `Unassigned` | `Dwindle` |
 | Shrink Horizontally / Vertically | `Unassigned` | `Dwindle` |
 | Grow / Shrink Focused Window | `Unassigned` | `Dwindle` |
+| Move Edge Left / Right / Up / Down | `Unassigned` | `Dwindle` |
 | Preselect Left / Right / Up / Down | `Unassigned` | `Dwindle` |
 | Clear Preselection | `Unassigned` | `Dwindle` |
 | Raise All Floating Windows | `Option + Shift + R` | `Shared` |
