@@ -32,84 +32,236 @@ extension DwindleLayoutEngine {
         return resize(selected, by: delta, orientation: orientation, state: state)
     }
 
-    /// Resizes `node` along `orientation`, starting with its nearest split on that axis.
-    /// When growing and minimum sizes pin that split, the space comes from the next split up
-    /// instead, and every pinned split in between keeps its other side at its current size.
+    /// Resizes the window at `leaf` by moving one of its edges along `axis`. Growing pushes the
+    /// right edge (bottom edge for height), taking space from the windows on that side, nearest first,
+    /// each down to its minimum; shrinking gives the space to the window on that side. Windows on the
+    /// other side keep their size. Only when that side has nothing to give (or no window) does the
+    /// opposite edge move instead. One step is `delta / 2` of the workspace length on the axis.
     private func resize(
-        _ node: DwindleNode,
+        _ leaf: DwindleNode,
         by delta: CGFloat,
-        orientation: DwindleOrientation,
+        orientation axis: DwindleOrientation,
         state: DwindleWorkspaceState
     ) -> Bool {
-        var pinned: [(split: DwindleNode, child: DwindleNode)] = []
-        var current = node
-        while let parent = current.parent {
-            defer { current = parent }
-            guard case let .split(splitOrientation, ratio) = parent.kind,
-                  splitOrientation == orientation,
-                  splitHasTwoVisibleBranches(parent, excluding: state.excludedTokens)
-            else { continue }
-
-            let isFirst = current.isFirstChild(of: parent)
-            let effective = clampedRatio(ratio, for: parent, state: state)
-            let target = clampedRatio(isFirst ? effective + delta : effective - delta, for: parent, state: state)
-            let growth = isFirst ? target - effective : effective - target
-            guard abs(growth) > 0.0001, (growth > 0) == (delta > 0) else {
-                guard delta > 0 else { return false }
-                pinned.append((parent, current))
-                continue
+        guard delta != 0,
+              let rootFrame = state.root.cachedFrame,
+              axisLength(of: rootFrame, axis) > 0
+        else { return false }
+        let amount = abs(delta) / 2 * axisLength(of: rootFrame, axis)
+        // Layout y grows upward, so the bottom neighbor is the first child of a vertical split.
+        let preferredNeighborIsFirst = axis == .vertical
+        var slots: [ObjectIdentifier: CGFloat] = [:]
+        collectSlotLengths(of: state.root, in: rootFrame, axis: axis, into: &slots)
+        for neighborIsFirst in [preferredNeighborIsFirst, !preferredNeighborIsFirst] {
+            var edit = DwindleEdgeResize(axis: axis, excludedTokens: state.excludedTokens, slots: slots)
+            let moved = delta > 0
+                ? growEdge(of: leaf, by: amount, neighborIsFirst: neighborIsFirst, edit: &edit)
+                : shrinkEdge(of: leaf, by: amount, neighborIsFirst: neighborIsFirst, edit: &edit)
+            guard moved > 0.5 else { continue }
+            let previousRatios = edit.touchedSplits.map { ($0, $0.kind) }
+            guard applyRatios(of: edit) else { continue }
+            var updated: [ObjectIdentifier: CGFloat] = [:]
+            collectSlotLengths(of: state.root, in: rootFrame, axis: axis, into: &updated)
+            let leafChange = (updated[ObjectIdentifier(leaf)] ?? 0) - (slots[ObjectIdentifier(leaf)] ?? 0)
+            if delta > 0 ? leafChange > 0.5 : leafChange < -0.5 {
+                return true
             }
-
-            let lengthChange = parent.cachedFrame.map { frame in
-                axisLength(of: frame, orientation) * (
-                    pathFraction(target, isFirst: isFirst) - pathFraction(effective, isFirst: isFirst)
-                )
+            for (split, kind) in previousRatios {
+                split.kind = kind
             }
-            parent.kind = .split(orientation: orientation, ratio: target)
-            if let lengthChange {
-                keepOtherSidesFixed(in: pinned, growingBy: lengthChange, orientation: orientation, state: state)
-            }
-            return true
         }
         return false
     }
 
-    private func keepOtherSidesFixed(
-        in pinned: [(split: DwindleNode, child: DwindleNode)],
-        growingBy lengthChange: CGFloat,
-        orientation: DwindleOrientation,
-        state: DwindleWorkspaceState
-    ) {
-        for (split, child) in pinned {
-            guard case let .split(_, ratio) = split.kind,
-                  let frame = split.cachedFrame
+    private func growEdge(
+        of leaf: DwindleNode,
+        by amount: CGFloat,
+        neighborIsFirst: Bool,
+        edit: inout DwindleEdgeResize
+    ) -> CGFloat {
+        var remaining = amount
+        var current = leaf
+        while remaining > 0.5, let parent = current.parent {
+            defer { current = parent }
+            guard isResizableSplit(parent, edit: edit),
+                  current.isFirstChild(of: parent) != neighborIsFirst,
+                  let neighbor = neighborIsFirst ? parent.firstChild() : parent.secondChild()
             else { continue }
-            let isFirst = child.isFirstChild(of: split)
-            let oldLength = axisLength(of: frame, orientation)
-            let newLength = oldLength + lengthChange
-            guard newLength > 0 else { continue }
-            let otherLength = oldLength * (1 - pathFraction(
-                clampedRatio(ratio, for: split, state: state),
-                isFirst: isFirst
-            ))
-            let childFraction = (newLength - otherLength) / newLength
-            let firstFraction = isFirst ? childFraction : 1 - childFraction
-            split.kind = .split(orientation: orientation, ratio: settings.clampedRatio(2 * firstFraction))
+            let take = min(remaining, spareLength(of: neighbor, in: parent, edit: edit))
+            guard take > 0.5 else { continue }
+            change(leaf, upTo: current, by: take, edit: &edit)
+            shrink(neighbor, by: take, fromSideFirst: !neighborIsFirst, edit: &edit)
+            edit.touch(parent)
+            remaining -= take
+        }
+        return amount - remaining
+    }
+
+    private func shrinkEdge(
+        of leaf: DwindleNode,
+        by amount: CGFloat,
+        neighborIsFirst: Bool,
+        edit: inout DwindleEdgeResize
+    ) -> CGFloat {
+        var current = leaf
+        while let parent = current.parent {
+            defer { current = parent }
+            guard isResizableSplit(parent, edit: edit),
+                  current.isFirstChild(of: parent) != neighborIsFirst,
+                  let neighbor = neighborIsFirst ? parent.firstChild() : parent.secondChild()
+            else { continue }
+            let give = min(amount, spareLength(of: leaf, in: parent, edit: edit))
+            guard give > 0.5 else { return 0 }
+            change(leaf, upTo: current, by: -give, edit: &edit)
+            grow(neighbor, by: give, fromSideFirst: !neighborIsFirst, edit: &edit)
+            edit.touch(parent)
+            return give
+        }
+        return 0
+    }
+
+    /// Changes the length of every node from `leaf` up to `top` by `change`; the splits in between keep
+    /// their other side's length, so the whole change lands on `leaf`.
+    private func change(_ leaf: DwindleNode, upTo top: DwindleNode, by change: CGFloat, edit: inout DwindleEdgeResize) {
+        var node = leaf
+        while true {
+            edit.lengths[ObjectIdentifier(node)] = length(of: node, edit: edit) + change
+            guard node !== top, let parent = node.parent else { return }
+            if isResizableSplit(parent, edit: edit) {
+                edit.touch(parent)
+            }
+            node = parent
         }
     }
 
-    private func clampedRatio(_ ratio: CGFloat, for split: DwindleNode, state: DwindleWorkspaceState) -> CGFloat {
-        clampedRatioRespectingMinimums(
-            ratio,
-            for: split,
-            innerGap: settings.innerGap,
-            excludedTokens: state.excludedTokens
-        )
+    /// Shrinks `node` by `amount`, taking first from the part nearest the moving edge.
+    private func shrink(_ node: DwindleNode, by amount: CGFloat, fromSideFirst: Bool, edit: inout DwindleEdgeResize) {
+        edit.lengths[ObjectIdentifier(node)] = length(of: node, edit: edit) - amount
+        if isResizableSplit(node, edit: edit) {
+            edit.touch(node)
+        }
+        forEachVisibleChild(of: node, edit: edit, fromSideFirst: fromSideFirst) { near, far in
+            guard let far else {
+                shrink(near, by: amount, fromSideFirst: fromSideFirst, edit: &edit)
+                return
+            }
+            let nearTake = min(amount, spareLength(of: near, in: node, edit: edit))
+            shrink(near, by: nearTake, fromSideFirst: fromSideFirst, edit: &edit)
+            shrink(far, by: amount - nearTake, fromSideFirst: fromSideFirst, edit: &edit)
+        } across: { first, second in
+            shrink(first, by: amount, fromSideFirst: fromSideFirst, edit: &edit)
+            shrink(second, by: amount, fromSideFirst: fromSideFirst, edit: &edit)
+        }
     }
 
-    private func pathFraction(_ ratio: CGFloat, isFirst: Bool) -> CGFloat {
-        let firstFraction = settings.ratioToFraction(ratio)
-        return isFirst ? firstFraction : 1 - firstFraction
+    /// Grows `node` by `amount`, giving all of it to the part nearest the moving edge.
+    private func grow(_ node: DwindleNode, by amount: CGFloat, fromSideFirst: Bool, edit: inout DwindleEdgeResize) {
+        edit.lengths[ObjectIdentifier(node)] = length(of: node, edit: edit) + amount
+        if isResizableSplit(node, edit: edit) {
+            edit.touch(node)
+        }
+        forEachVisibleChild(of: node, edit: edit, fromSideFirst: fromSideFirst) { near, _ in
+            grow(near, by: amount, fromSideFirst: fromSideFirst, edit: &edit)
+        } across: { first, second in
+            grow(first, by: amount, fromSideFirst: fromSideFirst, edit: &edit)
+            grow(second, by: amount, fromSideFirst: fromSideFirst, edit: &edit)
+        }
+    }
+
+    /// Visits `node`'s visible children: `along` for a split on the resize axis (nearest child first,
+    /// `far` is nil when only one child is visible), `across` for a perpendicular split.
+    private func forEachVisibleChild(
+        of node: DwindleNode,
+        edit: DwindleEdgeResize,
+        fromSideFirst: Bool,
+        along: (_ near: DwindleNode, _ far: DwindleNode?) -> Void,
+        across: (_ first: DwindleNode, _ second: DwindleNode) -> Void
+    ) {
+        guard case let .split(orientation, _) = node.kind,
+              let first = node.firstChild(),
+              let second = node.secondChild()
+        else { return }
+        let firstVisible = subtreeHasVisibleMember(first, excluding: edit.excludedTokens)
+        let secondVisible = subtreeHasVisibleMember(second, excluding: edit.excludedTokens)
+        guard firstVisible, secondVisible else {
+            if firstVisible || secondVisible {
+                along(firstVisible ? first : second, nil)
+            }
+            return
+        }
+        if orientation == edit.axis {
+            along(fromSideFirst ? first : second, fromSideFirst ? second : first)
+        } else {
+            across(first, second)
+        }
+    }
+
+    private func applyRatios(of edit: DwindleEdgeResize) -> Bool {
+        var changed = false
+        for node in edit.touchedSplits {
+            guard case let .split(orientation, ratio) = node.kind,
+                  let first = node.firstChild(),
+                  let second = node.secondChild()
+            else { continue }
+            let firstLength = length(of: first, edit: edit)
+            let total = firstLength + length(of: second, edit: edit)
+            guard total > 0 else { continue }
+            let newRatio = settings.clampedRatio(2 * firstLength / total)
+            guard abs(newRatio - ratio) > 0.0001 else { continue }
+            node.kind = .split(orientation: orientation, ratio: newRatio)
+            changed = true
+        }
+        return changed
+    }
+
+    private func isResizableSplit(_ node: DwindleNode, edit: DwindleEdgeResize) -> Bool {
+        node.splitOrientation == edit.axis && splitHasTwoVisibleBranches(node, excluding: edit.excludedTokens)
+    }
+
+    private func length(of node: DwindleNode, edit: DwindleEdgeResize) -> CGFloat {
+        edit.lengths[ObjectIdentifier(node)] ?? edit.slots[ObjectIdentifier(node)] ?? 0
+    }
+
+    private func minimumLength(of node: DwindleNode, edit: DwindleEdgeResize) -> CGFloat {
+        edit.axis == .horizontal ? node.projectedMinSize.width : node.projectedMinSize.height
+    }
+
+    /// How much `node` can shrink inside `split`: down to its minimum size, and never below the
+    /// smallest share a split ratio allows.
+    private func spareLength(of node: DwindleNode, in split: DwindleNode, edit: DwindleEdgeResize) -> CGFloat {
+        let smallestShare = length(of: split, edit: edit) * settings.ratioToFraction(0.1)
+        return max(0, length(of: node, edit: edit) - max(minimumLength(of: node, edit: edit), smallestShare))
+    }
+
+    /// Slot lengths from the current ratios, split exactly as the layout pass splits them, so repeated
+    /// commands stay consistent before the next relayout runs.
+    private func collectSlotLengths(
+        of node: DwindleNode,
+        in rect: CGRect,
+        axis: DwindleOrientation,
+        into slots: inout [ObjectIdentifier: CGFloat]
+    ) {
+        slots[ObjectIdentifier(node)] = axisLength(of: rect, axis)
+        guard case let .split(orientation, ratio) = node.kind,
+              let first = node.firstChild(),
+              let second = node.secondChild()
+        else { return }
+        let firstVisible = first.projectedVisibleLeafCount > 0
+        let secondVisible = second.projectedVisibleLeafCount > 0
+        guard firstVisible, secondVisible else {
+            if firstVisible || secondVisible {
+                collectSlotLengths(of: firstVisible ? first : second, in: rect, axis: axis, into: &slots)
+            }
+            return
+        }
+        let (firstRect, secondRect) = splitRect(
+            rect,
+            orientation: orientation,
+            ratio: ratio,
+            minimums: (first: first.projectedMinSize, second: second.projectedMinSize)
+        )
+        collectSlotLengths(of: first, in: firstRect, axis: axis, into: &slots)
+        collectSlotLengths(of: second, in: secondRect, axis: axis, into: &slots)
     }
 
     private func axisLength(of frame: CGRect, _ orientation: DwindleOrientation) -> CGFloat {
@@ -194,5 +346,20 @@ extension DwindleLayoutEngine {
         guard newRatio != currentRatio else { return false }
         ancestor.split.kind = .split(orientation: orientation, ratio: newRatio)
         return true
+    }
+}
+
+/// Pending edge-resize lengths along one axis, applied to split ratios at the end.
+private struct DwindleEdgeResize {
+    let axis: DwindleOrientation
+    let excludedTokens: Set<WindowToken>
+    let slots: [ObjectIdentifier: CGFloat]
+    var lengths: [ObjectIdentifier: CGFloat] = [:]
+    private(set) var touchedSplits: [DwindleNode] = []
+
+    mutating func touch(_ split: DwindleNode) {
+        if !touchedSplits.contains(where: { $0 === split }) {
+            touchedSplits.append(split)
+        }
     }
 }
