@@ -16,20 +16,66 @@ extension DwindleLayoutEngine {
         guard let state = existingState(for: workspaceId),
               let selected = selectedNode(in: workspaceId)
         else { return false }
-        return resize(selected, by: delta, orientation: targetOrientation, state: state)
+
+        var current = selected
+        while let parent = current.parent {
+            guard case let .split(orientation, ratio) = parent.kind else {
+                current = parent
+                continue
+            }
+
+            if orientation == targetOrientation,
+               splitHasTwoVisibleBranches(parent, excluding: state.excludedTokens)
+            {
+                let isFirst = current.isFirstChild(of: parent)
+                let newRatio = isFirst ? ratio + delta : ratio - delta
+
+                let clampedRatio = clampedRatioRespectingMinimums(
+                    newRatio,
+                    for: parent,
+                    innerGap: settings.innerGap,
+                    excludedTokens: state.excludedTokens
+                )
+                guard clampedRatio != ratio else { return false }
+                parent.kind = .split(orientation: orientation, ratio: clampedRatio)
+                return true
+            }
+
+            current = parent
+        }
+        return false
     }
 
     @discardableResult
     func resizeFocusedWindow(by delta: CGFloat, in workspaceId: WorkspaceDescriptor.ID) -> Bool {
         assertSanctionedMutation()
         guard let state = existingState(for: workspaceId),
-              let selected = selectedNode(in: workspaceId),
-              let orientation = firstVisibleSplitAncestor(
-                  from: selected,
-                  excluding: state.excludedTokens
-              )?.split.splitOrientation
+              let selected = selectedNode(in: workspaceId)
         else { return false }
-        return resize(selected, by: delta, orientation: orientation, state: state)
+
+        var current = selected
+        while let parent = current.parent {
+            guard case let .split(orientation, ratio) = parent.kind else {
+                current = parent
+                continue
+            }
+            guard splitHasTwoVisibleBranches(parent, excluding: state.excludedTokens) else {
+                current = parent
+                continue
+            }
+            let isFirst = current.isFirstChild(of: parent)
+            let newRatio = isFirst ? ratio + delta : ratio - delta
+            let clampedRatio = clampedRatioRespectingMinimums(
+                newRatio,
+                for: parent,
+                innerGap: settings.innerGap,
+                excludedTokens: state.excludedTokens
+            )
+            guard clampedRatio != ratio else { return false }
+            parent.kind = .split(orientation: orientation, ratio: clampedRatio)
+            return true
+        }
+        return false
     }
 
     /// Moves a border of the selected window in `direction`: its right edge (bottom edge for height)
@@ -75,16 +121,15 @@ extension DwindleLayoutEngine {
         return false
     }
 
-    /// Resizes the window at `leaf` by moving its right edge (bottom edge for height) along `axis`.
+    /// Resizes the window at `leaf` by moving its edge on the `neighborIsFirst` side along `axis`.
     /// Growing takes space equally from the windows on that side that can give; shrinking gives the
-    /// space equally to them. Windows on the other side never change, so a window with nothing on that
-    /// side (or nothing able to give) does not resize. One step is `delta / 2` of the workspace length
-    /// on the axis.
+    /// space equally to them. Windows on the other side never change. One step is `delta / 2` of the
+    /// workspace length on the axis.
     private func resize(
         _ leaf: DwindleNode,
         by delta: CGFloat,
         orientation axis: DwindleOrientation,
-        neighborIsFirst: Bool? = nil,
+        neighborIsFirst: Bool,
         state: DwindleWorkspaceState
     ) -> Bool {
         guard delta != 0,
@@ -95,12 +140,11 @@ extension DwindleLayoutEngine {
         var slots: [ObjectIdentifier: CGFloat] = [:]
         collectSlotLengths(of: state.root, in: rootFrame, axis: axis, into: &slots)
         var edit = DwindleEdgeResize(axis: axis, excludedTokens: state.excludedTokens, slots: slots)
-        // Layout y grows upward, so the bottom neighbor is the first child of a vertical split.
         let moved = moveEdge(
             of: leaf,
             by: amount,
             growing: delta > 0,
-            neighborIsFirst: neighborIsFirst ?? (axis == .vertical),
+            neighborIsFirst: neighborIsFirst,
             edit: &edit
         )
         guard moved > 0.5 else { return false }

@@ -34,12 +34,11 @@ final class DwindleResizeFocusedTests: XCTestCase {
         XCTAssertEqual(engine.root(for: ws)?.splitRatio ?? 0, 0.9, accuracy: 1e-6)
     }
 
-    func testRightmostWindowDoesNotResizeIntoTheLeft() {
+    func testGrowSecondChildDecreasesRatio() {
         let (engine, ws, _, second) = makeTwoWindowEngine()
         engine.setSelectedNode(engine.findNode(for: second, in: ws), in: ws)
-        XCTAssertFalse(engine.resizeFocusedWindow(by: 0.1, in: ws))
-        XCTAssertFalse(engine.resizeFocusedWindow(by: -0.1, in: ws))
-        XCTAssertEqual(engine.root(for: ws)?.splitRatio ?? 0, 1.0, accuracy: 1e-6)
+        XCTAssertTrue(engine.resizeFocusedWindow(by: 0.1, in: ws))
+        XCTAssertEqual(engine.root(for: ws)?.splitRatio ?? 0, 0.9, accuracy: 1e-6)
     }
 
     func testRatioClampsAtMaxAndStops() {

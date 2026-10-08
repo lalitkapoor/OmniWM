@@ -45,7 +45,7 @@ final class DwindleResizeSelectedTests: XCTestCase {
         orientation: DwindleOrientation,
         delta: CGFloat,
         selectedChild: SelectedChild,
-        expectedRatio: CGFloat?,
+        expectedRatio: CGFloat,
         file: StaticString = #filePath,
         line: UInt = #line
     ) {
@@ -56,44 +56,41 @@ final class DwindleResizeSelectedTests: XCTestCase {
             in: fixture.workspaceId
         )
 
-        XCTAssertEqual(
+        XCTAssertTrue(
             fixture.engine.resizeSelected(
                 by: delta,
                 orientation: orientation,
                 in: fixture.workspaceId
             ),
-            expectedRatio != nil,
             file: file,
             line: line
         )
         XCTAssertEqual(
             fixture.engine.root(for: fixture.workspaceId)?.splitRatio ?? 0,
-            expectedRatio ?? 1.0,
+            expectedRatio,
             accuracy: 1e-6,
             file: file,
             line: line
         )
     }
 
-    // Resizing moves the right edge (bottom edge for height) and never changes windows on the other
-    // side, so the right window and the bottom window (the first child; layout y grows upward) do not resize.
-    func testHorizontalGrowMovesTheRightEdge() {
+    func testHorizontalGrowNormalizesForSelectedChild() {
         assertResize(orientation: .horizontal, delta: 0.1, selectedChild: .first, expectedRatio: 1.1)
-        assertResize(orientation: .horizontal, delta: 0.1, selectedChild: .second, expectedRatio: nil)
+        assertResize(orientation: .horizontal, delta: 0.1, selectedChild: .second, expectedRatio: 0.9)
     }
 
-    func testHorizontalShrinkMovesTheRightEdge() {
+    func testHorizontalShrinkNormalizesForSelectedChild() {
         assertResize(orientation: .horizontal, delta: -0.1, selectedChild: .first, expectedRatio: 0.9)
-        assertResize(orientation: .horizontal, delta: -0.1, selectedChild: .second, expectedRatio: nil)
+        assertResize(orientation: .horizontal, delta: -0.1, selectedChild: .second, expectedRatio: 1.1)
     }
 
-    func testVerticalGrowMovesTheBottomEdge() {
-        assertResize(orientation: .vertical, delta: 0.1, selectedChild: .first, expectedRatio: nil)
+    func testVerticalGrowNormalizesForSelectedChild() {
+        assertResize(orientation: .vertical, delta: 0.1, selectedChild: .first, expectedRatio: 1.1)
         assertResize(orientation: .vertical, delta: 0.1, selectedChild: .second, expectedRatio: 0.9)
     }
 
-    func testVerticalShrinkMovesTheBottomEdge() {
-        assertResize(orientation: .vertical, delta: -0.1, selectedChild: .first, expectedRatio: nil)
+    func testVerticalShrinkNormalizesForSelectedChild() {
+        assertResize(orientation: .vertical, delta: -0.1, selectedChild: .first, expectedRatio: 0.9)
         assertResize(orientation: .vertical, delta: -0.1, selectedChild: .second, expectedRatio: 1.1)
     }
 
@@ -146,11 +143,8 @@ final class DwindleResizeSelectedTests: XCTestCase {
         XCTAssertEqual(root.splitRatio ?? 0, 1.1, accuracy: 1e-6)
         XCTAssertEqual(nearerSplit.splitRatio ?? 0, 1.0, accuracy: 1e-6)
 
-        // `first` is the bottom of the vertical split, so its nearest axis has nothing below it.
-        XCTAssertFalse(engine.resizeFocusedWindow(by: 0.1, in: workspaceId))
-        engine.setSelectedNode(engine.findNode(for: third, in: workspaceId), in: workspaceId)
         XCTAssertTrue(engine.resizeFocusedWindow(by: 0.1, in: workspaceId))
         XCTAssertEqual(root.splitRatio ?? 0, 1.1, accuracy: 1e-6)
-        XCTAssertEqual(nearerSplit.splitRatio ?? 0, 0.9, accuracy: 1e-6)
+        XCTAssertEqual(nearerSplit.splitRatio ?? 0, 1.1, accuracy: 1e-6)
     }
 }

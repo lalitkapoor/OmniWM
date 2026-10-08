@@ -171,8 +171,8 @@ Workspace IDs are global, so `switch-workspace 3` targets workspace `3` wherever
 | `command move-to-root` | — | dwindle | Move the selected window to the root split |
 | `command toggle-split` | — | dwindle | Toggle the active split orientation |
 | `command swap-split` | — | dwindle | Swap the active split |
-| `command resize` | `<horizontal\|vertical> <grow\|shrink>` | dwindle | Grow or shrink the selected window by moving its right (or bottom) edge; windows on that side share the change equally |
-| `command resize-focused` | `<grow\|shrink>` | dwindle | Grow or shrink the focused window along its nearest split's axis by moving its right (or bottom) edge |
+| `command resize` | `<horizontal\|vertical> <grow\|shrink>` | dwindle | Grow or shrink the selected window along an axis |
+| `command resize-focused` | `<grow\|shrink>` | dwindle | Grow or shrink the focused window |
 | `command move-edge` | `<left\|right\|up\|down>` | dwindle | Move a border of the focused window in that direction: its right (bottom) edge when a window is on that side, otherwise its left (top) edge |
 | `command preselect` | `<left\|right\|up\|down>` | dwindle | Set the preselection direction |
 | `command preselect clear` | — | dwindle | Clear the preselection |

@@ -5,49 +5,20 @@ import CoreGraphics
 @testable import OmniWM
 import XCTest
 
-/// Layout under test (screen 1600x900): `L` fills the left half; the right half has `T` on top and a
+/// Move Edge on the layout under test (screen 1600x900): `L` fills the left half; the right half has `T` on top and a
 /// row of `A`, `B` and `C` below it. `B` was grouped into `A` and extracted again, so `B` and `A`
 /// share `A`'s former slot: extracting right gives `A | B | C`, extracting left gives `B | A | C`.
-final class DwindleEdgeResizeTests: XCTestCase {
+final class DwindleMoveEdgeTests: XCTestCase {
     private let screen = CGRect(x: 0, y: 0, width: 1600, height: 900)
 
-    // MARK: - Growing pushes the right edge
+    // MARK: - Shared engine behavior (equal shares, minimum sizes)
 
-    func testGrowTakesFromTheRightAndLeavesTheLeftAlone() throws {
-        let fixture = try makeFixture(extract: .right)
-        let before = frames(fixture)
-        XCTAssertLessThan(before.a.maxX, before.b.minX, "A sits left of B")
-
-        XCTAssertTrue(fixture.engine.resizeFocusedWindow(by: 0.1, in: fixture.ws))
-
-        let after = frames(fixture)
-        XCTAssertEqual(after.a, before.a)
-        XCTAssertEqual(after.b.minX, before.b.minX, accuracy: 0.5)
-        XCTAssertGreaterThan(after.b.width, before.b.width + 20)
-        XCTAssertEqual(after.b.width - before.b.width, before.c.width - after.c.width, accuracy: 1)
-        XCTAssertEqual(after.c.maxX, before.c.maxX, accuracy: 0.5)
-        XCTAssertEqual(after.l, before.l)
-        XCTAssertEqual(after.t, before.t)
-    }
-
-    func testGrowHorizontallyMatchesGrowFocusedWindow() throws {
-        let fixture = try makeFixture(extract: .right)
-        let before = frames(fixture)
-
-        XCTAssertTrue(fixture.engine.resizeSelected(by: 0.1, orientation: .horizontal, in: fixture.ws))
-
-        let after = frames(fixture)
-        XCTAssertEqual(after.a, before.a)
-        XCTAssertGreaterThan(after.b.width, before.b.width + 20)
-        XCTAssertLessThan(after.c.width, before.c.width - 20)
-    }
-
-    func testGrowTakesEquallyFromEveryWindowToTheRight() throws {
+    func testMoveEdgeRightTakesEquallyFromEveryWindowToTheRight() throws {
         let fixture = try makeFixture(extract: .left, aMinWidth: 1)
         let before = frames(fixture)
         XCTAssertLessThan(before.b.maxX, before.a.minX, "B sits left of A")
 
-        XCTAssertTrue(fixture.engine.resizeFocusedWindow(by: 0.1, in: fixture.ws))
+        XCTAssertTrue(fixture.engine.moveEdge(.right, by: 0.1, in: fixture.ws))
 
         let after = frames(fixture)
         let aGave = before.a.width - after.a.width
@@ -60,12 +31,12 @@ final class DwindleEdgeResizeTests: XCTestCase {
         XCTAssertEqual(after.l, before.l)
     }
 
-    func testGrowSkipsNeighborAtItsMinimumAndTakesFromTheNextOne() throws {
+    func testMoveEdgeRightSkipsWindowsAtTheirMinimum() throws {
         let fixture = try makeFixture(extract: .left)
         let before = frames(fixture)
         XCTAssertEqual(before.a.width, Self.aMinWidth, accuracy: 1)
 
-        XCTAssertTrue(fixture.engine.resizeFocusedWindow(by: 0.1, in: fixture.ws))
+        XCTAssertTrue(fixture.engine.moveEdge(.right, by: 0.1, in: fixture.ws))
 
         let after = frames(fixture)
         XCTAssertEqual(after.b.minX, before.b.minX, accuracy: 0.5)
@@ -75,11 +46,11 @@ final class DwindleEdgeResizeTests: XCTestCase {
         XCTAssertEqual(after.c.maxX, before.c.maxX, accuracy: 0.5)
     }
 
-    func testGrowStopsWhenEverythingToTheRightIsAtItsMinimumAndNeverTouchesTheLeft() throws {
+    func testMoveEdgeRightStopsWhenEverythingToTheRightIsAtItsMinimum() throws {
         let fixture = try makeFixture(extract: .right, aMinWidth: 150)
         let start = frames(fixture)
         var steps = 0
-        while fixture.engine.resizeFocusedWindow(by: 0.1, in: fixture.ws), steps < 50 {
+        while fixture.engine.moveEdge(.right, by: 0.1, in: fixture.ws), steps < 50 {
             let current = frames(fixture)
             XCTAssertEqual(current.a, start.a, "step \(steps)")
             XCTAssertEqual(current.l, start.l, "step \(steps)")
@@ -92,29 +63,13 @@ final class DwindleEdgeResizeTests: XCTestCase {
         XCTAssertEqual(final.c.width, Self.cMinWidth, accuracy: 1)
         XCTAssertEqual(final.a, start.a)
         XCTAssertEqual(final.l, start.l)
-        XCTAssertFalse(fixture.engine.resizeFocusedWindow(by: 0.1, in: fixture.ws))
     }
 
-    // MARK: - Shrinking pulls the right edge in
-
-    func testShrinkGivesSpaceToTheRightAndLeavesTheLeftAlone() throws {
-        let fixture = try makeFixture(extract: .right)
-        let before = frames(fixture)
-
-        XCTAssertTrue(fixture.engine.resizeFocusedWindow(by: -0.1, in: fixture.ws))
-
-        let after = frames(fixture)
-        XCTAssertEqual(after.a, before.a)
-        XCTAssertEqual(after.b.minX, before.b.minX, accuracy: 0.5)
-        XCTAssertLessThan(after.b.width, before.b.width)
-        XCTAssertEqual(before.b.width - after.b.width, after.c.width - before.c.width, accuracy: 1)
-    }
-
-    func testShrinkGivesSpaceEquallyToEveryWindowToTheRight() throws {
+    func testMoveEdgeLeftGivesSpaceEquallyToEveryWindowToTheRight() throws {
         let fixture = try makeFixture(extract: .left, aMinWidth: 1)
         let before = frames(fixture)
 
-        XCTAssertTrue(fixture.engine.resizeFocusedWindow(by: -0.1, in: fixture.ws))
+        XCTAssertTrue(fixture.engine.moveEdge(.left, by: 0.1, in: fixture.ws))
 
         let after = frames(fixture)
         let aGained = after.a.width - before.a.width
@@ -126,44 +81,9 @@ final class DwindleEdgeResizeTests: XCTestCase {
         XCTAssertEqual(after.l, before.l)
     }
 
-    // MARK: - Fallbacks and other axes
-
-    func testRightmostWindowNeverResizesIntoTheLeft() throws {
+    func testMoveEdgeDoesNothingWhenNothingOnThatSideCanGive() throws {
         let fixture = try makeFixture(extract: .right)
-        fixture.engine.setSelectedNode(fixture.engine.findNode(for: fixture.c, in: fixture.ws), in: fixture.ws)
-        let before = frames(fixture)
-
-        XCTAssertFalse(fixture.engine.resizeFocusedWindow(by: 0.1, in: fixture.ws))
-        XCTAssertFalse(fixture.engine.resizeFocusedWindow(by: -0.1, in: fixture.ws))
-
-        let after = frames(fixture)
-        XCTAssertEqual(after.a, before.a)
-        XCTAssertEqual(after.b, before.b)
-        XCTAssertEqual(after.c, before.c)
-        XCTAssertEqual(after.l, before.l)
-    }
-
-    func testHeightGrowPushesTheBottomEdge() throws {
-        let fixture = try makeFixture(extract: .right)
-        fixture.engine.setSelectedNode(fixture.engine.findNode(for: fixture.t, in: fixture.ws), in: fixture.ws)
-        let before = frames(fixture)
-        XCTAssertGreaterThan(before.t.minY, before.b.maxY, "T sits above the row (layout y grows upward)")
-
-        XCTAssertTrue(fixture.engine.resizeSelected(by: 0.1, orientation: .vertical, in: fixture.ws))
-
-        let after = frames(fixture)
-        XCTAssertEqual(after.t.maxY, before.t.maxY, accuracy: 0.5, "T's top edge stays put")
-        XCTAssertGreaterThan(after.t.height, before.t.height + 20)
-        for (name, row) in [("A", (before.a, after.a)), ("B", (before.b, after.b)), ("C", (before.c, after.c))] {
-            XCTAssertLessThan(row.1.height, row.0.height - 20, name)
-            XCTAssertEqual(row.1.width, row.0.width, accuracy: 0.5, name)
-        }
-        XCTAssertEqual(after.l, before.l)
-    }
-
-    func testGrowNeverSwitchesAxis() throws {
-        let fixture = try makeFixture(extract: .right)
-        for token in [fixture.a, fixture.c, fixture.l] {
+        for token in [fixture.c, fixture.l] {
             fixture.engine.updateWindowConstraints(
                 for: token,
                 constraints: WindowSizeConstraints(
@@ -175,11 +95,12 @@ final class DwindleEdgeResizeTests: XCTestCase {
         }
         let before = frames(fixture)
 
-        XCTAssertFalse(fixture.engine.resizeSelected(by: 0.1, orientation: .horizontal, in: fixture.ws))
-        XCTAssertFalse(fixture.engine.resizeFocusedWindow(by: 0.1, in: fixture.ws))
+        XCTAssertFalse(fixture.engine.moveEdge(.right, by: 0.1, in: fixture.ws))
 
-        XCTAssertEqual(frames(fixture).b, before.b)
-        XCTAssertEqual(frames(fixture).t, before.t)
+        let after = frames(fixture)
+        XCTAssertEqual(after.b, before.b)
+        XCTAssertEqual(after.a, before.a)
+        XCTAssertEqual(after.t, before.t)
     }
 
     // MARK: - Move Edge Left / Right / Up / Down
