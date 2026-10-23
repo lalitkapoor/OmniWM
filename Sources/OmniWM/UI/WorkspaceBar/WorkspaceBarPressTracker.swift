@@ -20,11 +20,17 @@ struct WorkspaceBarPressTracker {
         case beginDrag(WorkspaceDescriptor.ID, WindowToken)
         case continueDrag
         case endDrag
+        case focusWorkspace(WorkspaceDescriptor.ID)
+        case beginWorkspaceReorder(WorkspaceDescriptor.ID)
+        case continueWorkspaceReorder
+        case endWorkspaceReorder
     }
 
     private enum Press: Equatable {
         case window(WorkspaceDescriptor.ID, WindowToken, origin: CGPoint)
+        case workspace(WorkspaceDescriptor.ID, origin: CGPoint)
         case dragging
+        case reorderingWorkspace
         case consumedUntilRelease
     }
 
@@ -40,7 +46,7 @@ struct WorkspaceBarPressTracker {
     ) -> Decision {
         switch kind {
         case .rightDown:
-            guard press != .dragging else { return .consume }
+            guard press != .dragging, press != .reorderingWorkspace else { return .consume }
             return target.map(Decision.showMenu) ?? .passThrough
         case .leftDown:
             return handleLeftDown(modifiers: modifiers, target: target, location: location)
@@ -51,8 +57,12 @@ struct WorkspaceBarPressTracker {
             switch press {
             case let .window(workspaceId, token, _):
                 return target == .window(workspaceId, token) ? .activateWindow(workspaceId, token) : .consume
+            case let .workspace(workspaceId, _):
+                return target == .workspace(workspaceId) ? .focusWorkspace(workspaceId) : .consume
             case .dragging:
                 return .endDrag
+            case .reorderingWorkspace:
+                return .endWorkspaceReorder
             case .consumedUntilRelease:
                 return .consume
             case nil:
@@ -67,8 +77,14 @@ struct WorkspaceBarPressTracker {
             where hypot(location.x - origin.x, location.y - origin.y) >= Self.dragThreshold:
             press = .dragging
             return .beginDrag(workspaceId, token)
+        case let .workspace(workspaceId, origin)
+            where hypot(location.x - origin.x, location.y - origin.y) >= Self.dragThreshold:
+            press = .reorderingWorkspace
+            return .beginWorkspaceReorder(workspaceId)
         case .dragging:
             return .continueDrag
+        case .reorderingWorkspace:
+            return .continueWorkspaceReorder
         case nil:
             return .passThrough
         default:
@@ -95,10 +111,15 @@ struct WorkspaceBarPressTracker {
             press = .consumedUntilRelease
             return .moveFocusedWindow(workspaceId)
         }
-        if case let .window(workspaceId, token) = target {
+        switch target {
+        case let .window(workspaceId, token):
             press = .window(workspaceId, token, origin: location)
             return .consume
+        case let .workspace(workspaceId):
+            press = .workspace(workspaceId, origin: location)
+            return .consume
+        case .scratchpad:
+            return .passThrough
         }
-        return .passThrough
     }
 }

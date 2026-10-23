@@ -21,6 +21,8 @@ extension IPCCommandRouter {
             )
         case let .rename(target, displayName):
             return renameWorkspace(target, displayName: displayName)
+        case let .reorder(target, position):
+            return reorderWorkspace(target, position: position)
         }
     }
 
@@ -78,6 +80,19 @@ extension IPCCommandRouter {
         case .notFound:
             return .notFound
         }
+    }
+
+    private func reorderWorkspace(_ target: WorkspaceTarget, position: String) -> ExternalCommandResult {
+        guard let position = WorkspaceIDPolicy.normalizeRawID(position) else { return .invalidArguments }
+        let rawWorkspaceID: String
+        switch IPCCommandValidation.workspaceTarget(target, controller: controller) {
+        case let .success(resolved):
+            rawWorkspaceID = resolved
+        case let .failure(result):
+            return result
+        }
+
+        return controller.reorderWorkspace(named: rawWorkspaceID, toPosition: position)
     }
 
     private func renameWorkspace(_ target: WorkspaceTarget, displayName: String) -> ExternalCommandResult {

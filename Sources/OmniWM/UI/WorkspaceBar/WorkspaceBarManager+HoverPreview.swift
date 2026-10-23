@@ -33,7 +33,8 @@ extension WorkspaceBarManager {
             hoverPreview.hoverEnded(key)
             return
         }
-        guard !dragController.isDragging, !menuPresenter.isTracking, let target = hoverTarget(for: key) else { return }
+        guard !dragController.isDragging, !reorderController.isDragging, !menuPresenter.isTracking,
+              let target = hoverTarget(for: key) else { return }
         hoverPreview.hoverBegan(target)
     }
 

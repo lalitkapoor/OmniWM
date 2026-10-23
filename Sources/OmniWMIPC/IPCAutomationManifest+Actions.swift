@@ -23,6 +23,12 @@ extension IPCAutomationManifest {
             name: .rename,
             summary: "Set or clear a workspace display name; an empty name restores the raw workspace ID.",
             arguments: ["workspace", "display-name"]
+        ),
+        .init(
+            actionWords: ["reorder"],
+            name: .reorder,
+            summary: "Move a workspace to a numbered position, shifting the workspaces in between by one.",
+            arguments: ["workspace", "position"]
         )
     ]
 

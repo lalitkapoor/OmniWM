@@ -346,6 +346,7 @@ private struct WorkspaceItemView: View {
                 }
             }
         }
+        .workspaceBarReorderMarker(for: item.id, accentColor: accentColor)
         .onHover { hovering in
             isHovered = hovering
         }

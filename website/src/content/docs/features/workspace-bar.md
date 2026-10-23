@@ -17,6 +17,12 @@ Window hover previews can be turned off separately. Turning off the global Works
 - macOS-hidden windows are marked with an eye-slash badge; selecting a hidden window unhides its app and focuses that exact window.
 - Non-empty [scratchpad](/features/scratchpads/) slots appear as pills; clicking a pill toggles that scratchpad.
 
+## Reordering workspaces
+
+Drag a workspace chip (its number or the space around it, not an app icon) along the bar and drop it where it should go. An insertion marker shows the new spot. The workspace takes that number and the workspaces in between shift over by one: dropping workspace 4 before workspace 1 makes it workspace 1, and the old 1, 2 and 3 become 2, 3 and 4.
+
+Windows, their layout and focus stay with the workspace. Its settings row moves with it too, so its layout type, display name and monitor assignment follow the new number. App rules that assign apps to a workspace number keep pointing at that number. Hidden empty workspaces in between shift like the others. Press Escape to cancel a drag; dropping a chip next to its current position changes nothing. The same move is available as `omniwmctl workspace reorder <workspace> <position>`.
+
 ## System Stats
 
 Optionally show a System Stats button that opens a CPU, memory, GPU, disk, and uptime popup. The `Toggle System Stats` hotkey and `omniwmctl command toggle-system-stats` drive the same popup, and both do nothing unless a monitor currently shows that workspace-bar button. See the [CLI reference](/reference/cli/overview/).

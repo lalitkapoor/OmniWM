@@ -66,6 +66,7 @@ extension WorkspaceBarManager {
             let panels = [instance.primary.panel, instance.secondary?.panel].compactMap { $0 }
             autoHideTargets[index].isVisible = instance.primary.panel.isVisible
             autoHideTargets[index].isPinned = dragController.isDragging
+                || reorderController.isDragging
                 || menuMonitorId == instance.monitorId
                 || (renamePanel?.isVisible == true && renameMonitorId == instance.monitorId)
                 || hoverPreview?.visibleTarget.map { instance.monitor.frame.contains($0.attachment.anchor) } == true

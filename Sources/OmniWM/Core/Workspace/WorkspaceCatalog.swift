@@ -64,6 +64,19 @@ final class WorkspaceCatalog {
         return (previous, workspace)
     }
 
+    /// Renames several workspaces at once, so names may be exchanged between them (a one-at-a-time rename
+    /// would drop an index entry when one workspace takes a name another is giving up).
+    func renameWorkspaces(_ names: [WorkspaceDescriptor.ID: String]) {
+        for (id, name) in names {
+            workspacesById[id]?.name = name
+        }
+        workspaceIdByName = Dictionary(
+            workspacesById.values.map { ($0.name, $0.id) },
+            uniquingKeysWith: { first, _ in first }
+        )
+        cachedSortedWorkspaces = nil
+    }
+
     func insertWorkspace(_ workspace: WorkspaceDescriptor) {
         workspacesById[workspace.id] = workspace
         workspaceIdByName[workspace.name] = workspace.id
