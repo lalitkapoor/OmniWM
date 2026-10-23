@@ -20,6 +20,22 @@ extension WMController {
         return .executed
     }
 
+    /// Moves workspace `rawWorkspaceID` to number `position`, shifting the workspaces in between.
+    func reorderWorkspace(named rawWorkspaceID: String, toPosition position: String) -> ExternalCommandResult {
+        guard rawWorkspaceID != position else {
+            return workspaceManager.workspaceId(named: rawWorkspaceID) == nil ? .invalidArguments : .noChange
+        }
+        guard workspaceManager.reorderWorkspace(named: rawWorkspaceID, toPosition: position) != nil else {
+            return .invalidArguments
+        }
+        updateWorkspaceConfig()
+        requestWorkspaceBarRefresh()
+        if let ipcApplicationBridge {
+            Task { await ipcApplicationBridge.publishEvent(.activeWorkspace) }
+        }
+        return .executed
+    }
+
     func summonAnchorToken(in workspaceId: WorkspaceDescriptor.ID) -> WindowToken? {
         let token = if let focusedToken = workspaceManager.selectedManagedToken,
                        workspaceManager.entry(for: focusedToken)?.workspaceId == workspaceId

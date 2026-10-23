@@ -186,21 +186,31 @@ enum CLIParser {
                     direction: try CLIArgumentParser.parseDirection(positionals[1]),
                     force: flags.contains("--force")
                 )
-            case .rename:
-                guard remaining.count == descriptor.arguments.count,
-                      !remaining.contains(where: { $0.hasPrefix("--") })
-                else {
-                    continue
-                }
-                workspace = .rename(
-                    target: WorkspaceTarget(resolvingInput: remaining[0]),
-                    displayName: remaining[1]
-                )
+            case .rename,
+                 .reorder:
+                guard let (target, value) = targetAndValue(remaining, descriptor: descriptor) else { continue }
+                workspace = descriptor.name == .rename
+                    ? .rename(target: target, displayName: value)
+                    : .reorder(target: target, position: value)
             }
             return IPCRequest(id: id, workspace: workspace)
         }
 
         throw CLIParseError.usage(usageText)
+    }
+
+    /// The `<workspace> <value>` arguments of a workspace action that takes no flags.
+    private static func targetAndValue(
+        _ remaining: [String],
+        descriptor: IPCWorkspaceActionDescriptor
+    ) -> (WorkspaceTarget, String)? {
+        guard remaining.count == descriptor.arguments.count,
+              remaining.count == 2,
+              !remaining.contains(where: { $0.hasPrefix("--") })
+        else {
+            return nil
+        }
+        return (WorkspaceTarget(resolvingInput: remaining[0]), remaining[1])
     }
 
     private static func parseCaptureRequest(id: String, arguments: [String]) throws -> IPCRequest {

@@ -16,6 +16,42 @@ extension WorkspaceManager {
         }
     }
 
+    /// Moves workspace `source` to number `target`, shifting the workspaces in between by one. Windows,
+    /// layout trees and focus history follow the contents (they are keyed by workspace id); each moved
+    /// workspace's settings row is renamed with it, so its layout type, display name and monitor move too.
+    /// Returns the renamed workspaces, or nil when the move is not possible.
+    func reorderWorkspace(named source: String, toPosition target: String) -> [WorkspaceDescriptor.ID]? {
+        let descriptors = sortedWorkspaces()
+        guard let renames = WorkspaceReorderPlan.renames(
+            existing: descriptors.map(\.name),
+            moving: source,
+            to: target
+        ) else {
+            return nil
+        }
+        var newNames: [WorkspaceDescriptor.ID: String] = [:]
+        for descriptor in descriptors {
+            if let name = renames[descriptor.name] {
+                newNames[descriptor.id] = name
+            }
+        }
+        workspaceCatalog.renameWorkspaces(newNames)
+        settings.workspaces.configurations = settings.workspaces.configurations.map { configuration in
+            var configuration = configuration
+            if let name = renames[configuration.name] {
+                configuration.name = name
+            }
+            return configuration
+        }.sorted { $0.sortOrder < $1.sortOrder }
+        invalidateWorkspaceProjectionCaches()
+        for id in newNames.keys {
+            noteInvalidation(workspaceId: id, domains: [.workspace, .layout, .focus])
+        }
+        schedulePersistedWindowRestoreCatalogSave()
+        notifySessionStateChanged()
+        return Array(newNames.keys)
+    }
+
     func createWorkspace(
         named name: String,
         assignedMonitorPoint: CGPoint? = nil,

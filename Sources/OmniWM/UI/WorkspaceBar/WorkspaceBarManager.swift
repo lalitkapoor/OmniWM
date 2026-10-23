@@ -27,6 +27,7 @@ final class WorkspaceBarManager {
     var menuMonitorId: Monitor.ID?
     var renameMonitorId: Monitor.ID?
     let dragController = WorkspaceBarDragController()
+    lazy var reorderController = WorkspaceBarReorderController(presentation: dragController.presentation)
     var autoHideTargets: [WorkspaceBarAutoHideTarget] = []
     var autoHideState = WorkspaceBarAutoHideState()
     let autoHideDelays = WorkspaceBarAutoHideDelays()
@@ -51,6 +52,7 @@ final class WorkspaceBarManager {
             self?.setHiddenBarJoin(join)
         }
         configureDragController(controller: controller)
+        configureReorderController(controller: controller)
         syncHoverPreview(controller: controller, settings: settings)
     }
 
@@ -218,6 +220,7 @@ final class WorkspaceBarManager {
     private func removeBarForMonitor(_ monitorId: Monitor.ID) {
         if let instance = barsByMonitor[monitorId] {
             dragController.cancel()
+            reorderController.cancel()
             pressTracker.reset()
             controller?.dismissSystemStatsPopup(anchoredTo: monitorId)
             removeSecondaryPanel(from: instance)
@@ -237,6 +240,7 @@ final class WorkspaceBarManager {
         notificationBadgeTargetsByMonitor.removeAll()
         hoverPreview?.dismiss()
         dragController.cancel()
+        reorderController.cancel()
         menuPresenter.cancel()
         renamePanel?.dismiss()
         menuMonitorId = nil
@@ -409,6 +413,7 @@ extension WorkspaceBarManager {
     private func removeSecondaryPanel(from instance: WorkspaceBarInstance) {
         guard let secondary = instance.secondary else { return }
         dragController.cancel()
+        reorderController.cancel()
         surfaceCoordinator.unregister(id: instance.secondarySurfaceId())
         secondary.panel.orderOut(nil)
         secondary.panel.close()

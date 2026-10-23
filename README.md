@@ -1075,6 +1075,7 @@ See all windows at once with thumbnails:
 A visual indicator showing your workspaces:
 - Displays open apps per workspace
 - Click to switch workspaces or jump to that app
+- Drag a workspace chip along the bar to reorder workspaces: it takes the number where you drop it and the workspaces in between shift by one, with their windows, layout and settings (`omniwmctl workspace reorder <workspace> <position>` does the same)
 - When `Deduplicate App Icons` is enabled, multiple windows from one app share an icon; click a grouped icon to open their window list, while a single-window icon focuses that window directly
 - Marks macOS-hidden windows with an eye-slash badge; selecting a hidden window unhides its app and focuses that exact window
 - Configure position, height, and appearance in Settings

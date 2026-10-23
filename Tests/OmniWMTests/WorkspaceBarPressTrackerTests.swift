@@ -28,11 +28,23 @@ final class WorkspaceBarPressTrackerTests: XCTestCase {
         XCTAssertEqual(tracker.handle(.leftUp, modifiers: [], target: .workspace(workspaceId)), .passThrough)
     }
 
-    func testWorkspaceAndPillLeftClicksPassThroughToSwiftUI() {
+    func testWorkspaceClickFocusesOnReleaseOverTheSameWorkspace() {
         var tracker = WorkspaceBarPressTracker()
 
-        XCTAssertEqual(tracker.handle(.leftDown, modifiers: [], target: .workspace(workspaceId)), .passThrough)
+        XCTAssertEqual(tracker.handle(.leftDown, modifiers: [], target: .workspace(workspaceId)), .consume)
+        XCTAssertEqual(
+            tracker.handle(.leftUp, modifiers: [], target: .workspace(workspaceId)),
+            .focusWorkspace(workspaceId)
+        )
         XCTAssertEqual(tracker.handle(.leftUp, modifiers: [], target: .workspace(workspaceId)), .passThrough)
+
+        XCTAssertEqual(tracker.handle(.leftDown, modifiers: [], target: .workspace(workspaceId)), .consume)
+        XCTAssertEqual(tracker.handle(.leftUp, modifiers: [], target: .workspace(WorkspaceDescriptor.ID())), .consume)
+    }
+
+    func testPillAndEmptyLeftClicksPassThroughToSwiftUI() {
+        var tracker = WorkspaceBarPressTracker()
+
         XCTAssertEqual(tracker.handle(.leftDown, modifiers: [], target: .scratchpad(1)), .passThrough)
         XCTAssertEqual(tracker.handle(.leftDown, modifiers: [], target: nil), .passThrough)
     }
@@ -71,8 +83,8 @@ final class WorkspaceBarPressTrackerTests: XCTestCase {
         var tracker = WorkspaceBarPressTracker()
 
         _ = tracker.handle(.leftDown, modifiers: [], target: .window(workspaceId, token))
-        XCTAssertEqual(tracker.handle(.leftDown, modifiers: [], target: .workspace(workspaceId)), .passThrough)
-        XCTAssertEqual(tracker.handle(.leftUp, modifiers: [], target: .workspace(workspaceId)), .passThrough)
+        XCTAssertEqual(tracker.handle(.leftDown, modifiers: [], target: .scratchpad(1)), .passThrough)
+        XCTAssertEqual(tracker.handle(.leftUp, modifiers: [], target: .scratchpad(1)), .passThrough)
     }
 
     func testDraggingAWindowIconPastTheThresholdStartsAndEndsADrag() {
@@ -112,17 +124,31 @@ final class WorkspaceBarPressTrackerTests: XCTestCase {
         XCTAssertEqual(tracker.handle(.leftUp, modifiers: [], target: nil, location: CGPoint(x: 20, y: 0)), .endDrag)
     }
 
-    func testDraggingFromAWorkspaceLabelDoesNotStartADrag() {
+    func testDraggingAWorkspacePastTheThresholdStartsAndEndsAReorder() {
         var tracker = WorkspaceBarPressTracker()
 
         XCTAssertEqual(
             tracker.handle(.leftDown, modifiers: [], target: .workspace(workspaceId), location: .zero),
-            .passThrough
+            .consume
+        )
+        XCTAssertEqual(
+            tracker.handle(.leftDragged, modifiers: [], target: nil, location: CGPoint(x: 4, y: 0)),
+            .consume
         )
         XCTAssertEqual(
             tracker.handle(.leftDragged, modifiers: [], target: nil, location: CGPoint(x: 50, y: 0)),
-            .passThrough
+            .beginWorkspaceReorder(workspaceId)
         )
+        XCTAssertEqual(
+            tracker.handle(.leftDragged, modifiers: [], target: nil, location: CGPoint(x: 90, y: 0)),
+            .continueWorkspaceReorder
+        )
+        XCTAssertEqual(tracker.handle(.rightDown, modifiers: [], target: .workspace(workspaceId)), .consume)
+        XCTAssertEqual(
+            tracker.handle(.leftUp, modifiers: [], target: .workspace(workspaceId), location: CGPoint(x: 90, y: 0)),
+            .endWorkspaceReorder
+        )
+        XCTAssertEqual(tracker.handle(.leftUp, modifiers: [], target: .workspace(workspaceId)), .passThrough)
     }
 
     func testIslandInteractionPrefersWindowAndPillTargetsOverTheirWorkspace() {

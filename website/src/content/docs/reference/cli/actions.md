@@ -48,6 +48,7 @@ Marks give live managed windows unique names across workspaces. They last until 
 omniwmctl workspace focus-name <name>
 omniwmctl workspace move-to-monitor <workspace> <left|right|up|down> [--force]
 omniwmctl workspace rename <workspace> <display-name>
+omniwmctl workspace reorder <workspace> <position>
 ```
 
 | Action | Arguments | Description |
@@ -55,6 +56,7 @@ omniwmctl workspace rename <workspace> <display-name>
 | `focus-name` | `<name>` | Focus a workspace by raw workspace ID or unambiguous configured display name |
 | `move-to-monitor` | `<workspace> <left\|right\|up\|down> [--force]` | Move a workspace to an adjacent monitor |
 | `rename` | `<workspace> <display-name>` | Set or clear the workspace display name; an empty name restores the raw workspace ID. Returns `no_change` when the label already matches |
+| `reorder` | `<workspace> <position>` | Move a workspace to a numbered position, shifting the workspaces in between by one. Its windows, layout and settings row move with it. Returns `no_change` for its current position and `invalid_arguments` for a position past the highest workspace |
 
 Numeric inputs are resolved as raw workspace IDs first. Display-name lookup is a convenience path and fails when multiple workspaces share the same display name. A display name containing a newline is rejected with `invalid_arguments`, and a name starting with `--` cannot be set from the CLI.
 

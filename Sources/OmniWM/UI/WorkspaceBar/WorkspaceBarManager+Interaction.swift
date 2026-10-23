@@ -41,9 +41,14 @@ extension WorkspaceBarManager {
         let screenPoint = panel.convertPoint(toScreen: event.locationInWindow)
         if kind == .leftDown || kind == .rightDown {
             dragController.cancel()
+            reorderController.cancel()
             hoverPreview?.dismiss(suppressing: target)
         }
-        switch pressTracker.handle(kind, modifiers: event.modifierFlags, target: target, location: screenPoint) {
+        let decision = pressTracker.handle(kind, modifiers: event.modifierFlags, target: target, location: screenPoint)
+        if handleDragDecision(decision, target: target, at: screenPoint, snapshot: context.instance.model.snapshot) {
+            return true
+        }
+        switch decision {
         case .passThrough:
             return false
         case .consume:
@@ -57,22 +62,45 @@ extension WorkspaceBarManager {
         case let .activateWindow(workspaceId, token):
             activateWindowIcon(workspaceId: workspaceId, token: token, monitorId: context.instance.monitorId)
             return true
-        case let .beginDrag(workspaceId, token):
-            hoverPreview?.dismiss(suppressing: target)
-            beginDrag(
-                workspaceId: workspaceId,
-                token: token,
-                snapshot: context.instance.model.snapshot,
-                at: screenPoint
-            )
-            return true
-        case .continueDrag:
-            dragController.update(at: screenPoint)
-            return true
-        case .endDrag:
-            dragController.end(at: screenPoint)
+        case .beginDrag,
+             .continueDrag,
+             .endDrag,
+             .focusWorkspace,
+             .beginWorkspaceReorder,
+             .continueWorkspaceReorder,
+             .endWorkspaceReorder:
             return true
         }
+    }
+
+    /// Handles window-icon drags, a click on a workspace chip, and the reorder drag that starts from one.
+    private func handleDragDecision(
+        _ decision: WorkspaceBarPressTracker.Decision,
+        target: WorkspaceBarHitTarget?,
+        at screenPoint: CGPoint,
+        snapshot: WorkspaceBarSnapshot
+    ) -> Bool {
+        switch decision {
+        case let .beginDrag(workspaceId, token):
+            hoverPreview?.dismiss(suppressing: target)
+            beginDrag(workspaceId: workspaceId, token: token, snapshot: snapshot, at: screenPoint)
+        case .continueDrag:
+            dragController.update(at: screenPoint)
+        case .endDrag:
+            dragController.end(at: screenPoint)
+        case let .focusWorkspace(workspaceId):
+            controller?.focusWorkspaceFromBar(id: workspaceId)
+        case let .beginWorkspaceReorder(workspaceId):
+            hoverPreview?.dismiss(suppressing: target)
+            reorderController.begin(workspaceId: workspaceId, at: screenPoint)
+        case .continueWorkspaceReorder:
+            reorderController.update(at: screenPoint)
+        case .endWorkspaceReorder:
+            reorderController.end(at: screenPoint)
+        default:
+            return false
+        }
+        return true
     }
 
     func activateWindowIcon(workspaceId: WorkspaceDescriptor.ID, token: WindowToken, monitorId: Monitor.ID) {

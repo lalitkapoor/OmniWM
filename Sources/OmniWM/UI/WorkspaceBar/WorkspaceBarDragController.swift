@@ -8,6 +8,8 @@ import Observation
 final class WorkspaceBarDragPresentation {
     var sourceTokens: Set<WindowToken> = []
     var highlights: [WorkspaceBarDropHighlight] = []
+    var reorderSource: WorkspaceDescriptor.ID?
+    var reorderMarker: WorkspaceBarReorderMarker?
 
     func clear() {
         if !sourceTokens.isEmpty { sourceTokens = [] }

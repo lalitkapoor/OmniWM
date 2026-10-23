@@ -7,12 +7,14 @@ public enum IPCWorkspaceActionName: String, Codable, Equatable, Sendable {
     case focusName = "focus-name"
     case moveToMonitor = "move-to-monitor"
     case rename
+    case reorder
 }
 
 public enum IPCWorkspaceRequest: Equatable, Sendable {
     case focusName(target: WorkspaceTarget)
     case moveToMonitor(target: WorkspaceTarget, direction: IPCDirection, force: Bool = false)
     case rename(target: WorkspaceTarget, displayName: String)
+    case reorder(target: WorkspaceTarget, position: String)
 
     public var name: IPCWorkspaceActionName {
         switch self {
@@ -22,6 +24,8 @@ public enum IPCWorkspaceRequest: Equatable, Sendable {
             .moveToMonitor
         case .rename:
             .rename
+        case .reorder:
+            .reorder
         }
     }
 
@@ -29,7 +33,8 @@ public enum IPCWorkspaceRequest: Equatable, Sendable {
         switch self {
         case let .focusName(target),
              let .moveToMonitor(target, _, _),
-             let .rename(target, _):
+             let .rename(target, _),
+             let .reorder(target, _):
             target
         }
     }
@@ -42,6 +47,7 @@ extension IPCWorkspaceRequest: Codable {
         case direction
         case force
         case displayName
+        case position
     }
 
     public init(from decoder: Decoder) throws {
@@ -63,6 +69,8 @@ extension IPCWorkspaceRequest: Codable {
                 target: target,
                 displayName: try container.decode(String.self, forKey: .displayName)
             )
+        case .reorder:
+            self = .reorder(target: target, position: try container.decode(String.self, forKey: .position))
         }
     }
 
@@ -79,6 +87,8 @@ extension IPCWorkspaceRequest: Codable {
             try container.encode(force, forKey: .force)
         case let .rename(_, displayName):
             try container.encode(displayName, forKey: .displayName)
+        case let .reorder(_, position):
+            try container.encode(position, forKey: .position)
         }
     }
 }
