@@ -73,6 +73,7 @@ move-edge
 open-command-palette
 open-command-palette-mode
 raise-all-floating-windows
+toggle-floating-focus
 rescue-offscreen-windows
 toggle-workspace-layout
 set-workspace-layout
