@@ -9,7 +9,7 @@ import XCTest
 @MainActor
 final class TrackpadWorkspaceGestureTests: XCTestCase {
     func testOverviewSwipesOpenAndCloseOncePerContactWithoutSwitchingWorkspace() throws {
-        for fingerCount in [OverviewGestureFingerCount.three, .four] {
+        for fingerCount in [ThreeOrFourFingerCount.three, .four] {
             for invertDirection in [false, true] {
                 let fixture = try makeFixture(workspaceSwipeEnabled: false)
                 fixture.controller.setAnimationsEnabled(false)
@@ -698,7 +698,7 @@ final class TrackpadWorkspaceGestureTests: XCTestCase {
         workspaceFingers: GestureFingerCount = .three,
         workspaceAxis: WorkspaceSwipeAxis = .vertical,
         scrollGestureEnabled: Bool = false,
-        columnFingers: GestureFingerCount = .three,
+        columnFingers: ThreeOrFourFingerCount = .three,
         enableNiri: Bool = true,
         windowFocusOperations: WindowFocusOperations = WindowFocusOperations(
             activateApp: { _ in },
@@ -1956,15 +1956,15 @@ final class TrackpadWorkspaceGestureTests: XCTestCase {
 
     private func driveCommittedPartialLift(_ fixture: Fixture) -> TimeInterval {
         var time: TimeInterval = 100
-        sendFrame(fixture, phase: .began, fingers: 3, x: 0.5, y: 0.2, at: time)
+        sendFrame(fixture, phase: .began, fingers: 4, x: 0.5, y: 0.2, at: time)
         time += 0.01
-        sendFrame(fixture, phase: .changed, fingers: 3, x: 0.5, y: 0.24, at: time)
+        sendFrame(fixture, phase: .changed, fingers: 4, x: 0.5, y: 0.24, at: time)
         for _ in 0 ..< 12 {
             time += 0.01
-            sendFrame(fixture, phase: .changed, fingers: 3, x: 0.5, y: 0.24, at: time)
+            sendFrame(fixture, phase: .changed, fingers: 4, x: 0.5, y: 0.24, at: time)
         }
         time += 0.01
-        sendFrame(fixture, phase: .changed, fingers: 2, x: 0.5, y: 0.24, at: time)
+        sendFrame(fixture, phase: .changed, fingers: 3, x: 0.5, y: 0.24, at: time)
         return time
     }
 
@@ -2060,6 +2060,31 @@ final class TrackpadWorkspaceGestureTests: XCTestCase {
         XCTAssertTrue(gesture.contains("processed=false"))
     }
 
+    func testFreshScrollThatArmsAGestureReleasesTheEarlierGesturesMomentumLatch() throws {
+        let fixture = try makeFixture(workspaceFingers: .two, workspaceAxis: .horizontal)
+        let handler = fixture.controller.mouseEventHandler
+        let recorder = TrackpadScrollTrace.shared
+        recorder.beginCapture()
+        defer {
+            recorder.endCapture()
+            recorder.releaseStorage()
+        }
+
+        sendFrame(fixture, phase: .began, fingers: 2, x: 0.2, y: 0.5, at: 100)
+        sendFrame(fixture, phase: .changed, fingers: 2, x: 0.3, y: 0.5, at: 100.01)
+        sendFrame(fixture, phase: .ended, fingers: 0, x: 0, y: 0, at: 100.02)
+        XCTAssertTrue(handler.state.suppressTrackpadMomentumScroll)
+
+        sendFrame(fixture, phase: .began, fingers: 2, x: 0.5, y: 0.5, at: 101)
+        XCTAssertEqual(handler.state.gesturePhase, .armed)
+        try assertTracedScroll(fixture, phase: CGScrollPhase.began.rawValue, decision: .activeGesture)
+        sendFrame(fixture, phase: .changed, fingers: 2, x: 0.5, y: 0.6, at: 101.01)
+        XCTAssertEqual(handler.state.gesturePhase, .idle)
+
+        try assertTracedScroll(fixture, phase: CGScrollPhase.changed.rawValue, decision: .trackpadUnclaimed)
+        try assertTracedScroll(fixture, momentumPhase: 2, decision: .trackpadUnclaimed)
+    }
+
     @discardableResult
     private func assertTracedScroll(
         _ fixture: Fixture,
@@ -2092,9 +2117,9 @@ final class TrackpadWorkspaceGestureTests: XCTestCase {
 
     func testCommittedPartialLiftLatchesAndBlocksChainedGesture() throws {
         let fixture = try makeFixture(
-            workspaceFingers: .three,
+            workspaceFingers: .four,
             scrollGestureEnabled: true,
-            columnFingers: .two
+            columnFingers: .three
         )
         var time = driveCommittedPartialLift(fixture)
 
@@ -2107,7 +2132,7 @@ final class TrackpadWorkspaceGestureTests: XCTestCase {
 
         for step in 1 ... 6 {
             time += 0.01
-            sendFrame(fixture, phase: .changed, fingers: 2, x: 0.5 + 0.03 * CGFloat(step), y: 0.24, at: time)
+            sendFrame(fixture, phase: .changed, fingers: 3, x: 0.5 + 0.03 * CGFloat(step), y: 0.24, at: time)
         }
         XCTAssertEqual(handler.state.gesturePhase, .idle)
 
@@ -2119,9 +2144,9 @@ final class TrackpadWorkspaceGestureTests: XCTestCase {
 
     func testCommittedPartialLiftConsumesScrollAndMomentumTail() throws {
         let fixture = try makeFixture(
-            workspaceFingers: .three,
+            workspaceFingers: .four,
             scrollGestureEnabled: true,
-            columnFingers: .two
+            columnFingers: .three
         )
         var time = driveCommittedPartialLift(fixture)
         let handler = fixture.controller.mouseEventHandler

@@ -21,6 +21,9 @@ extension SettingsExport {
         var excludedBundleIDs: [String]
         var iconOverrides: [String: String]
         var reserveLayoutSpace: Bool
+        var autoHide: Bool = false
+        var autoHideRevealDelayMilliseconds: Double = 0
+        var autoHideHideDelayMilliseconds: Double = 0
         var revealModifier: WorkspaceBarRevealModifier
         var revealHoldMilliseconds: Double
         var hideInNativeFullscreen: Bool
@@ -65,6 +68,13 @@ extension SettingsExport.WorkspaceBar {
         excludedBundleIDs = try container.decode([String].self, forKey: .excludedBundleIDs)
         iconOverrides = try container.decode([String: String].self, forKey: .iconOverrides)
         reserveLayoutSpace = try container.decode(Bool.self, forKey: .reserveLayoutSpace)
+        autoHide = try container.decodeIfPresent(Bool.self, forKey: .autoHide) ?? defaults.autoHide
+        autoHideRevealDelayMilliseconds = try container.decodeIfPresent(
+            Double.self, forKey: .autoHideRevealDelayMilliseconds
+        ) ?? defaults.autoHideRevealDelayMilliseconds
+        autoHideHideDelayMilliseconds = try container.decodeIfPresent(
+            Double.self, forKey: .autoHideHideDelayMilliseconds
+        ) ?? defaults.autoHideHideDelayMilliseconds
         revealModifier = try container.decode(WorkspaceBarRevealModifier.self, forKey: .revealModifier)
         revealHoldMilliseconds = try container.decode(Double.self, forKey: .revealHoldMilliseconds)
         hideInNativeFullscreen = try container.decode(Bool.self, forKey: .hideInNativeFullscreen)
@@ -103,6 +113,7 @@ extension SettingsExport.WorkspaceBar {
             excludedBundleIDs: [],
             iconOverrides: [:],
             reserveLayoutSpace: false,
+            autoHide: false,
             revealModifier: .off,
             revealHoldMilliseconds: 200,
             hideInNativeFullscreen: false,

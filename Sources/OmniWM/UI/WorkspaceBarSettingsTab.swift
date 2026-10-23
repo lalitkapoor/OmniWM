@@ -117,12 +117,46 @@ private struct GlobalBarSettingsSection: View {
                         controller.updateWorkspaceBarSettings()
                     }
 
+                Toggle("Automatically hide and show the workspace bar", isOn: Bindable(settings.workspaceBar).autoHide)
+                    .onChange(of: settings.workspaceBar.autoHide) { _, _ in
+                        controller.updateWorkspaceBarSettings()
+                    }
+                    .help(
+                        "Show at the bar edge; hide when the pointer moves inward past the bar and interactions end. Never reserves layout space."
+                    )
+
+                if settings.workspaceBar.autoHide || settings.workspaceBar.monitorOverrides
+                    .contains(where: { $0.autoHide == true })
+                {
+                    SettingsSliderRow(
+                        label: String(localized: "Auto-Hide Reveal Delay"),
+                        value: Bindable(settings.workspaceBar).autoHideRevealDelayMilliseconds,
+                        range: 0 ... 1000,
+                        step: 50,
+                        valueText: String(localized: "\(Int(settings.workspaceBar.autoHideRevealDelayMilliseconds)) ms")
+                    )
+                    .onChange(of: settings.workspaceBar.autoHideRevealDelayMilliseconds) { _, _ in
+                        controller.updateWorkspaceBarSettings()
+                    }
+
+                    SettingsSliderRow(
+                        label: String(localized: "Auto-Hide Hide Delay"),
+                        value: Bindable(settings.workspaceBar).autoHideHideDelayMilliseconds,
+                        range: 0 ... 1000,
+                        step: 50,
+                        valueText: String(localized: "\(Int(settings.workspaceBar.autoHideHideDelayMilliseconds)) ms")
+                    )
+                    .onChange(of: settings.workspaceBar.autoHideHideDelayMilliseconds) { _, _ in
+                        controller.updateWorkspaceBarSettings()
+                    }
+                }
+
                 Toggle("Reserve Space for Workspace Bar", isOn: Bindable(settings.workspaceBar).reserveLayoutSpace)
                     .onChange(of: settings.workspaceBar.reserveLayoutSpace) { _, _ in
                         controller.updateWorkspaceBarSettings()
                     }
                     .help(
-                        "Reserve tiled layout space at the selected edge using the configured bar thickness."
+                        "Reserve tiled layout space at the selected edge. Overlapping bars reserve only the portion below the menu bar."
                     )
 
                 Picker("Reveal on Modifier Hold", selection: Bindable(settings.workspaceBar).revealModifier) {
@@ -133,7 +167,7 @@ private struct GlobalBarSettingsSection: View {
                 .onChange(of: settings.workspaceBar.revealModifier) { _, _ in
                     controller.updateWorkspaceBarSettings()
                 }
-                .help("Show the workspace bar as an overlay only while the selected modifiers are held")
+                .help("Reveal the workspace bar while holding these modifiers. Can be combined with automatic hiding.")
 
                 if settings.workspaceBar.revealModifier != .off {
                     SettingsSliderRow(

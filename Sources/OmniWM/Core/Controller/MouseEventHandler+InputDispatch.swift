@@ -31,6 +31,11 @@ extension MouseEventHandler {
         )
     }
 
+    var steadyTouchFrameFloor: Int {
+        guard state.gesturePhase == .idle, let config = trackpadGestureConfig else { return 0 }
+        return config.minimumFingerCount
+    }
+
     var overviewGestureInteractive: Bool {
         controller?.motionPolicy.animationsEnabled == true
     }
@@ -101,6 +106,7 @@ extension MouseEventHandler {
         }
         controller?.mouseWarpHandler.handleMouseWarpMoved(at: location)
         recordMouseWarpSample()
+        controller?.workspaceBarManager.handleAutoHideMouseMoved(at: location)
         beginNativeTitleBarDragIfNeeded(button: button)
         if !isCapturedInteraction(button), shouldBlockOwnWindowInput(at: location) {
             cancelActiveMouseInteraction()
@@ -321,7 +327,10 @@ extension MouseEventHandler {
     }
 
     private func trackpadScrollDecision(momentumPhase: UInt32, phase: UInt32) -> ScrollDecision {
-        if isTrackpadSwipeSessionActive { return .activeGesture }
+        if isTrackpadSwipeSessionActive {
+            if phase == CGScrollPhase.began.rawValue { state.suppressTrackpadMomentumScroll = false }
+            return .activeGesture
+        }
         if state.consumeTrackpadScrollUntilAllTouchesLift { return .liftLatch }
         if state.suppressTrackpadMomentumScroll {
             if momentumPhase != 0 { return .momentumTail }
@@ -395,8 +404,9 @@ extension MouseEventHandler {
         }
         controller?.mouseWarpHandler.handleMouseWarpMoved(at: location)
         recordMouseWarpSample()
+        controller?.workspaceBarManager.handleAutoHideMouseMoved(at: location)
         beginNativeTitleBarDragIfNeeded(button: button)
-        if shouldBlockOwnWindowInput(at: location) {
+        if !isCapturedInteraction(button), shouldBlockOwnWindowInput(at: location) {
             cancelActiveMouseInteraction()
             return
         }

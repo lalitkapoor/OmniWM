@@ -282,6 +282,23 @@ OmniWM is a free, open-source, Developer ID-signed and Apple-notarized tiling wi
       <br>
       <sub>@YuriNachos</sub>
     </td>
+    <td align="center" valign="top">
+      <a href="https://walt.io">
+        <img src="https://walt.io/apple-touch-icon.png" width="72" alt="Walt">
+      </a>
+      <br>
+      <a href="https://walt.io"><strong>Walt</strong></a>
+      <br>
+      <sub>━━━━━━━━</sub>
+      <br>
+      <a href="https://github.com/pltanton" title="Anton Plotnikov">
+        <img src="https://github.com/pltanton.png?size=96" width="72" alt="Anton Plotnikov">
+      </a>
+      <br>
+      <a href="https://github.com/pltanton"><strong>Anton Plotnikov</strong></a>
+      <br>
+      <sub>@pltanton</sub>
+    </td>
   </tr>
 </table>
 
@@ -402,6 +419,9 @@ OmniWM is a free, open-source, Developer ID-signed and Apple-notarized tiling wi
       <a href="https://github.com/minchik" title="Aliaksandr">
         <img src="https://github.com/minchik.png?size=96" width="72" alt="Aliaksandr">
       </a>
+      <a href="https://github.com/pltanton" title="Anton Plotnikov">
+        <img src="https://github.com/pltanton.png?size=96" width="72" alt="Anton Plotnikov">
+      </a>
       <a href="https://github.com/gloomy-breaker" title="Ayaan Sandhu">
         <img src="https://github.com/gloomy-breaker.png?size=96" width="72" alt="Ayaan Sandhu">
       </a>
@@ -456,6 +476,9 @@ OmniWM is a free, open-source, Developer ID-signed and Apple-notarized tiling wi
       <a href="https://github.com/jcardama" title="Jose Cardama">
         <img src="https://github.com/jcardama.png?size=96" width="72" alt="Jose Cardama">
       </a>
+      <a href="https://github.com/komarov-dc" title="KomarovD">
+        <img src="https://github.com/komarov-dc.png?size=96" width="72" alt="KomarovD">
+      </a>
       <a href="https://github.com/lgerlinski" title="Lukas Gerlinski">
         <img src="https://github.com/lgerlinski.png?size=96" width="72" alt="Lukas Gerlinski">
       </a>
@@ -479,6 +502,9 @@ OmniWM is a free, open-source, Developer ID-signed and Apple-notarized tiling wi
       </a>
       <a href="https://github.com/zwo-bot" title="mm">
         <img src="https://github.com/zwo-bot.png?size=96" width="72" alt="mm">
+      </a>
+      <a href="https://github.com/Mokhtar25" title="Mokhtar">
+        <img src="https://github.com/Mokhtar25.png?size=96" width="72" alt="Mokhtar">
       </a>
       <a href="https://github.com/MuhammadKh" title="muhammadkh">
         <img src="https://github.com/MuhammadKh.png?size=96" width="72" alt="muhammadkh">
@@ -535,6 +561,45 @@ OmniWM is a free, open-source, Developer ID-signed and Apple-notarized tiling wi
   </tr>
 </table>
 <!-- contributors:end -->
+
+<!-- bug-reporters:start -->
+### 🐞 Bug Reporters
+
+<p align="center">
+  Thank you to everyone whose bug reports led to fixes.
+</p>
+
+<table align="center">
+  <tr>
+    <td nowrap>
+      <a href="https://github.com/9j7axvsLuF" title="9j7axvsLuF">
+        <img src="https://github.com/9j7axvsLuF.png?size=96" width="72" alt="9j7axvsLuF">
+      </a>
+      <a href="https://github.com/monkeyjunglejuice" title="Dan Dee">
+        <img src="https://github.com/monkeyjunglejuice.png?size=96" width="72" alt="Dan Dee">
+      </a>
+      <a href="https://github.com/datarip" title="Datarip">
+        <img src="https://github.com/datarip.png?size=96" width="72" alt="Datarip">
+      </a>
+      <a href="https://github.com/0xGodspeed" title="Dhruv Jain">
+        <img src="https://github.com/0xGodspeed.png?size=96" width="72" alt="Dhruv Jain">
+      </a>
+      <a href="https://github.com/dna07rak" title="dna07rak">
+        <img src="https://github.com/dna07rak.png?size=96" width="72" alt="dna07rak">
+      </a>
+      <a href="https://github.com/macsmister" title="macsmister">
+        <img src="https://github.com/macsmister.png?size=96" width="72" alt="macsmister">
+      </a>
+      <a href="https://github.com/kashyapmanu" title="Manukashyap.U.V">
+        <img src="https://github.com/kashyapmanu.png?size=96" width="72" alt="Manukashyap.U.V">
+      </a>
+      <a href="https://github.com/maxandersen" title="Max Rydahl Andersen">
+        <img src="https://github.com/maxandersen.png?size=96" width="72" alt="Max Rydahl Andersen">
+      </a>
+    </td>
+  </tr>
+</table>
+<!-- bug-reporters:end -->
 
 <p align="center">
   <img src="https://img.shields.io/badge/macOS-26.0%2B-green?logo=apple&logoColor=white" alt="macOS">
@@ -653,13 +718,25 @@ After either installation, complete the macOS setup in steps 3-7 below.
 
 ### GitHub Releases
 
-1. Download the latest `OmniWM-v<version>.zip` app archive from [Releases](https://github.com/OmniNull/OmniWM/releases)
+1. Download the `OmniWM-v<version>.zip` app archive from the [latest release](https://github.com/OmniNull/OmniWM/releases/latest)
 2. Extract and move `OmniWM.app` to `/Applications`
 3. In System Settings > Desktop & Dock > Mission Control, turn **ON** `Displays have separate Spaces`
 4. Log out of macOS and log back in for that change to take effect unless you had it on already
 5. Launch OmniWM and grant Accessibility and Input Monitoring when prompted
 6. Optionally grant Screen Recording for capture-derived visuals
 7. Return to OmniWM’s permissions window and click **Start OmniWM** or **Continue Without Screen Recording**. If a required permission still appears missing, click **Check Again**
+
+### Canary builds
+
+Stable releases are recommended for everyday use. Canary builds let you try recent changes and help test fixes before the next release. They are built daily when `main` has new changes and are signed and notarized, but may contain regressions.
+
+To try one with a Homebrew or GitHub Releases install:
+
+1. Save a copy of `~/.config/omniwm/settings.toml`
+2. Quit OmniWM, then download the newest [canary build](https://github.com/OmniNull/OmniWM/releases?q=canary) and replace `OmniWM.app` in `/Applications` with the app from its ZIP
+3. Relaunch OmniWM. It uses your existing settings
+
+OmniWM's update check only tracks stable releases, so download newer canaries the same way. To return to stable, quit OmniWM. For a Homebrew install, run `brew reinstall --cask omniwm`; for a direct download, replace the app with the [latest release](https://github.com/OmniNull/OmniWM/releases/latest). If stable cannot read settings saved by a canary, quit OmniWM and restore your copy. When reporting a canary bug, include its release link.
 
 ## Updates
 
@@ -842,6 +919,7 @@ The window-to-monitor actions send the focused window directly to the current wo
 | Preselect Left / Right / Up / Down | `Unassigned` | `Dwindle` |
 | Clear Preselection | `Unassigned` | `Dwindle` |
 | Raise All Floating Windows | `Option + Shift + R` | `Shared` |
+| Toggle Floating/Tiled Focus | `Unassigned` | `Shared` |
 | Rescue Off-Screen Floating Windows | `Unassigned` | `Shared` |
 | Toggle Focused Window Floating | `Unassigned` | `Shared` |
 | Toggle Scratchpad 1-10 Assignment for Focused Window | `Unassigned` | `Shared` |
@@ -1007,6 +1085,7 @@ A visual indicator showing your workspaces:
 
 Workspace-bar appearance controls are optional and also support per-monitor overrides:
 
+- **Automatically hide and show** reveals the bar when the pointer touches its edge and hides it after the pointer moves inward past the bar and interactions end, without reserving layout space. Set `workspaceBar.autoHide = true`; the default is `false`.
 - **Transparent Background** removes the outer bar material, tint, and border; icons remain clickable. It takes precedence over **Solid Black Background**.
 - **Solid Black Background** uses opaque black instead of the outer bar's material and tint.
 - **Inactive Icon Opacity** adjusts non-focused app icons. Leaving it unset preserves the standard opacity for each kind of item; hidden-app icons retain their hidden-state appearance. Values are limited to 0–1, and nonfinite values are treated as unset.
