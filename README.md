@@ -956,6 +956,8 @@ The daily `Focus` and `Move` shortcuts adapt to the active layout and Niri orien
 
 Dwindle groups use the existing Focus and Move bindings, so there are no separate group shortcuts to memorize. Only the active member occupies the tile; the other members stay hidden and the clickable tab rail shows their order.
 
+When several tiles border the focused window on the side you focus or move toward, OmniWM picks the one at the top for **Left / Right** and the one at the left for **Up / Down**, whatever their sizes. For example, with a full-height window on the left and two windows stacked on the right, Focus Right goes to the top-right window. Move and Move Container choose their neighbor the same way.
+
 With **Settings > Dwindle Layout > Disable Tab Groups** (`dwindle.disableTabGroups = true`), Dwindle never forms groups: existing groups split into separate tiles, `Focus` moves spatially between tiles without visiting tabs, and `Move` swaps the focused tile with its neighbor exactly like `Move Container`.
 
 With **Settings > Dwindle Layout > Directional Focus Skips Tabs** (`dwindle.directionalFocusSkipsTabs = true`), `Focus` in every direction goes straight to the neighboring tile, keeping that tile's active tab; at an edge it only tries the monitor transition and never cycles or wraps tabs. Assign **Next Tab in Tile** and **Previous Tab in Tile** in Settings > Hotkeys to cycle the focused tile's tabs; they wrap locally and never leave the tile.
